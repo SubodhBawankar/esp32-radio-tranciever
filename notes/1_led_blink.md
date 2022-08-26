@@ -15,7 +15,6 @@ Here we are setting the LED on or off according to the 8 bits  hexadecimal numbe
 * _vTaskDelay(1000 / portTICK_RATE_MS);_
 delay of 1 Sec.
 
->> Those functions are defined inside SRA header file
-#include "sra_board.h"
+> Those functions are defined inside SRA header file **#include "sra_board.h"**
 
 Date: 19-08
