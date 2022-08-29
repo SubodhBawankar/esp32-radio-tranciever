@@ -1,8 +1,13 @@
 #include <stdio.h>
+
+
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
- 
+#include "esp_log.h"
+
+static const char* TAG = "GPIO CONTROL: ";
+
 
 //////// bar graph //////////
 #define BG_LED_1 32
@@ -29,7 +34,7 @@ void app_main()
     config_variable.intr_type = GPIO_INTR_DISABLE;
     esp_err_t err = gpio_config(&config_variable);
     if (err == ESP_OK){
-        ESP_LOGI("Config Done");
+        ESP_LOGI(TAG, "Config Done");
         while (1){
 
             for (int i = 0; i < 8; i++)
@@ -47,6 +52,6 @@ void app_main()
         }
     }
     else{
-        ESP_LOGE("Error: ", esp_err_to_name(err));
+        ESP_LOGE(TAG, "Error");
     }
 }

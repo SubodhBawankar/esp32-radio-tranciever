@@ -20,7 +20,7 @@ void app_main(){
 
     esp_err_t err = gpio_config(&config_variable);
 
-    if (err = ESP_OK){
+    if (err == ESP_OK){
         ESP_LOGI("GPIO Config Done");
         adc1_config_width(ADC_WIDTH_BIT_12);
         adc1_config_channel_atten(ADC_CHANNEL_4, ADC_ATTEN_DB_0);
