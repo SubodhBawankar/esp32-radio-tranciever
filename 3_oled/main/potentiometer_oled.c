@@ -30,12 +30,10 @@ void character_adc(){
     ESP_LOGI(TAG, "Reading %d", reading);
 
     u8g2_t u8g2_structure;
-    led_config(u8g2_structure);
-    printvoltage(u8g2_structure, reading);
+    led_config(&u8g2_structure);
+    printvoltage(&u8g2_structure, reading);
 
 }
-
-
 
 void app_main(void){
 
