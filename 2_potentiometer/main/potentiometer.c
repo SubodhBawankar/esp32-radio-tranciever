@@ -12,8 +12,8 @@ static const char* TAG = "POTENTIOMETER ";
 
 void config_adc(){
 
-    adc1_config_width(ADC1_WIDTH_BIT_12);
-    adc1_config_channel_atten(ADC1_CHANNEL_7, ADC1_ATTEN_DB_11);
+    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(ADC1_CHANNEL_7, ADC_ATTEN_DB_11);
     // ADC_CHANNEL_7 refers to 35 pin on 
     // esp32 where we have connected our potentiometer
     ESP_LOGI(TAG, "Config Done");
