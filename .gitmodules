@@ -1,0 +1,3 @@
+[submodule "Components/Components"]
+	path = Components/Components
+	url = https://github.com/olikraus/u8g2.git
