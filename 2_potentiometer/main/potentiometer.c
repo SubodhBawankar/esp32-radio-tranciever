@@ -24,6 +24,8 @@ void character_adc(){
     uint32_t reading;
     reading = adc1_get_raw(ADC1_CHANNEL_7);
     ESP_LOGI(TAG, "Reading %d", reading);
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 
 
