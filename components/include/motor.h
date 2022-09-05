@@ -3,10 +3,11 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "driver/gpio.h"
 
-#include "driver/mcpwm.h"
+#include "driver/ledc.h"
 #include "soc/mcpwm_periph.h"
 
-void config_motorA();
+esp_err_t config_MotorA();
 
-void set_MotorA();
+esp_err_t set_MotorA(int direction, uint32_t dutycycle);
