@@ -31,7 +31,7 @@ void oled_display(){
     ESP_LOGI(TAG, "OLED Config Done");
     while(1){
         printvoltage(&u8g2_structure, reading);
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
