@@ -31,7 +31,7 @@ void oled_display(){
     ESP_LOGI(TAG, "OLED Config Done");
     while(1){
         printvoltage(&u8g2_structure, reading);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
 
@@ -39,7 +39,7 @@ void character_adc(){
     while(1){
         reading = adc1_get_raw(ADC1_CHANNEL_7);
         ESP_LOGI(TAG, "Reading %d", reading);
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
@@ -59,7 +59,7 @@ void app_main(void){
     xTaskCreate( 
         oled_display, 
         "oled_display", 
-        2048, 
+        4096, 
         NULL, 
         2, 
         NULL
