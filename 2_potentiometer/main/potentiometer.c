@@ -22,8 +22,11 @@ void config_adc(){
 void character_adc(){
 
     uint32_t reading;
-    reading = adc1_get_raw(ADC1_CHANNEL_7);
-    ESP_LOGI(TAG, "Reading %d", reading);
+    while (1){
+        reading = adc1_get_raw(ADC1_CHANNEL_7);
+        ESP_LOGI(TAG, "Reading %d", reading);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 }
 
 
@@ -31,8 +34,13 @@ void character_adc(){
 void app_main(void){
 
     config_adc();
-    
-    while (1){
-        character_adc();
-    }
+
+    xTaskCreate(
+        &character_adc,
+        "character_adc",
+        2048,
+        NULL,
+        1,
+        NULL
+    );
 }
