@@ -35,7 +35,7 @@ esp_err_t config_MotorA(){
     return ESP_OK;
 }
 
-esp_err_t set_MotorA(int direction, uint32_t dutycycle){
+esp_err_t set_MotorA(int direction, float dutycycle){
 
     if(direction == 0){
         // Forward -------------

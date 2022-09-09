@@ -10,4 +10,4 @@
 
 esp_err_t config_MotorA();
 
-esp_err_t set_MotorA(int direction, uint32_t dutycycle);
+esp_err_t set_MotorA(int direction, float dutycycle);
