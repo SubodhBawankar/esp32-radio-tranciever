@@ -50,8 +50,9 @@ void motor_control(){
     // ? = (reading * 125) / 4095;
 
     float pwm;
-    pwm = (reading*125) / 4095;
-    while (1){
+    while (1){    
+        pwm = (reading*125) / 4095;
+        pwm += 100;
         set_MotorA(0, pwm);
         ESP_LOGI(TAG, "Duty Cycle = %f", pwm);
         // 0 - forward; pwm - duty cycle
