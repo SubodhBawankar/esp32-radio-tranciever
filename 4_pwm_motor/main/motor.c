@@ -52,10 +52,11 @@ void motor_control(){
     float pwm;
     while (1){    
         pwm = (reading*125) / 4095;
-        pwm += 100;
+        // pwm += 100;
         set_MotorA(0, pwm);
         ESP_LOGI(TAG, "Duty Cycle = %f", pwm);
         // 0 - forward; pwm - duty cycle
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
     }
 }
 
