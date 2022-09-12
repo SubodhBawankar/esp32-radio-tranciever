@@ -1,4 +1,4 @@
-/* * Data converted from /home/janhavi/Desktop/esp-idf-template/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /home/janhavi/Desktop/Radio_Tranciever/esp32-radio-tranciever/Potentiometer_Task/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 .section .rodata.embedded

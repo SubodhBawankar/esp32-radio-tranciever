@@ -1,4 +1,4 @@
-# Install script for directory: /home/janhavi/Desktop/esp-idf-template/main
+# Install script for directory: /home/janhavi/Desktop/Radio_Tranciever/esp32-radio-tranciever/Potentiometer_Task/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

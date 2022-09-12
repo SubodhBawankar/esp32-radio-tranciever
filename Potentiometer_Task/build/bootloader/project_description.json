@@ -1,8 +1,8 @@
 {
     "project_name":       "bootloader",
     "project_path":       "/home/janhavi/esp/esp-idf/components/bootloader/subproject",
-    "build_dir":          "/home/janhavi/Desktop/esp-idf-template/build/bootloader",
-    "config_file":        "/home/janhavi/Desktop/esp-idf-template/sdkconfig",
+    "build_dir":          "/home/janhavi/Desktop/Radio_Tranciever/esp32-radio-tranciever/Potentiometer_Task/build/bootloader",
+    "config_file":        "/home/janhavi/Desktop/Radio_Tranciever/esp32-radio-tranciever/Potentiometer_Task/sdkconfig",
     "config_defaults":    "",
     "app_elf":            "bootloader.elf",
     "app_bin":            "bootloader.bin",
