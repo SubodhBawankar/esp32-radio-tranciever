@@ -46,17 +46,15 @@ void motor_control(){
     // converting reading from range of 0 to 4095 to pwm range 100 to 225
     // not using pwm < 100, small value for motors 
     // reading ---- 4095 (0-4095)
-    // ?       ---- 125  (100-225)
-    // ? = (reading * 125) / 4095;
 
-    float pwm;
+    float pwm = 0;
     while (1){    
-        pwm = (reading*125) / 4095;
-        // pwm += 100;
+        pwm = (reading*100) / 4095;
+        
         set_MotorA(0, pwm);
         ESP_LOGI(TAG, "Duty Cycle = %f", pwm);
         // 0 - forward; pwm - duty cycle
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);        
     }
 }
 
@@ -66,7 +64,7 @@ void app_main(void){
     if (config_MotorA() == ESP_OK){
         ESP_LOGI(TAG, "Motors Config Done");    
     }
-
+    
     xTaskCreate( 
         character_adc, 
         "character_adc", 
@@ -75,15 +73,17 @@ void app_main(void){
         1, 
         NULL
     );
+    
 
     xTaskCreate( 
         motor_control, 
         "motor_control", 
         2048, 
         NULL, 
-        2, 
+        1, 
         NULL
     );
+    
     xTaskCreate( 
         oled_display, 
         "oled_display", 
@@ -92,5 +92,6 @@ void app_main(void){
         3, 
         NULL
     );
+    
 }
 

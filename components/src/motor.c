@@ -14,9 +14,9 @@ TB6612FNG
 */
 
 
-#define INA1 32 // MCPWM0A
-#define INA2 33 // MCPWM0B
-#define PWMA 25 // MCPWM1A
+#define INA1 25 // MCPWM0A
+#define INA2 26 // MCPWM0B
+#define PWMA 27 // MCPWM1A
 
 static const char *TAG = "Motor.h";
 
@@ -41,7 +41,7 @@ esp_err_t set_MotorA(int direction, float dutycycle){
         // Forward -------------
         mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, dutycycle);
         mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MCPWM_DUTY_MODE_0);
-
+    
         mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
         // ---------------------
     }
