@@ -13,6 +13,7 @@
 static const char* TAG = "Motor Control";
 
 int reading = 1;
+int pwm;
 
 void config_adc(){
 
@@ -22,20 +23,10 @@ void config_adc(){
     // esp32 where we have connected our potentiometer
 }
 
-void oled_display(){
-    
-    u8g2_t u8g2_structure;
-    led_config(&u8g2_structure);
-    ESP_LOGI(TAG, "OLED Config Done");
-    while(1){
-        printvoltage(&u8g2_structure, reading);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
 void character_adc(){
     while(1){
         reading = adc1_get_raw(ADC1_CHANNEL_7);
+        pwm = (reading*100) / 4095;
         ESP_LOGI(TAG, "Reading %d", reading);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -44,17 +35,17 @@ void character_adc(){
 void motor_control(){
     
     // converting reading from range of 0 to 4095 to pwm range 100 to 225
-    // not using pwm < 100, small value for motors 
     // reading ---- 4095 (0-4095)
 
-    float pwm = 0;
     while (1){    
-        pwm = (reading*100) / 4095;
         
         set_MotorA(0, pwm);
-        ESP_LOGI(TAG, "Duty Cycle = %f", pwm);
+        ESP_LOGI(TAG, "Duty Cycle = %d", pwm);
+        
         // 0 - forward; pwm - duty cycle
-        vTaskDelay(1000 / portTICK_PERIOD_MS);        
+        vTaskDelay(100 / portTICK_PERIOD_MS); 
+
+               
     }
 }
 
@@ -70,12 +61,12 @@ void app_main(void){
         "character_adc", 
         2048, 
         NULL, 
-        1, 
+        2, 
         NULL
     );
     
-
-    xTaskCreate( 
+    
+    xTaskCreate(
         motor_control, 
         "motor_control", 
         2048, 
@@ -83,15 +74,5 @@ void app_main(void){
         1, 
         NULL
     );
-    
-    xTaskCreate( 
-        oled_display, 
-        "oled_display", 
-        4096, 
-        NULL, 
-        3, 
-        NULL
-    );
-    
 }
 

@@ -25,7 +25,7 @@ esp_err_t config_MotorA(){
     mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, INA2);
 
     mcpwm_config_t motorA;
-    motorA.frequency = 20000;
+    motorA.frequency = 10;
     motorA.cmpr_a = 0;
     motorA.cmpr_b = 0;
     motorA.duty_mode = MCPWM_DUTY_MODE_0;
@@ -43,6 +43,7 @@ esp_err_t set_MotorA(int direction, float dutycycle){
         mcpwm_set_duty_type(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MCPWM_DUTY_MODE_0);
     
         mcpwm_set_signal_low(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B);
+
         // ---------------------
     }
     else{
