@@ -4,9 +4,10 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
-#include "driver/spi_common.h"
-#include "driver/spi_master.h"
+
+#include <driver/spi_master.h>
+#include <driver/gpio.h>
+#include "esp_log.h"
 
 /* Memory Map */
 #define CONFIG      0x00
@@ -88,29 +89,55 @@
 #define REUSE_TX_PL   0xE3
 #define NOP           0xFF
 
+/* Non-P omissions */
+#define LNA_HCURR   0
+
+/* P model memory Map */
+#define RPD                  0x09
+#define W_TX_PAYLOAD_NO_ACK  0xB0
+
+/* P model bit Mnemonics */
+#define RF_DR_LOW   5
+#define RF_DR_HIGH  3
+#define RF_PWR_LOW  1
+#define RF_PWR_HIGH 2
+
+
+#define mirf_ADDR_LEN    5                        //Device addrees length:3~5 bytes
+#define mirf_CONFIG ((1<<EN_CRC) | (0<<CRCO) ) //enable CRC and CRC data len=1;mirf_CONFIG ==1000B
+
+
 /* Pins Definations */
 #define MOSI    23
 #define MISO    19
-#define CLK     18
+#define SCLK    18
 #define CE      16
 #define CSN     17
 
-
-
-
-
-esp_err_t spi_config();
-
-esp_err_t spi_write_byte(uint8_t* Dataout, size_t DataLength);
-
-esp_err_t spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength);
-
-esp_err_t assign_register(uint8_t reg, uint8_t value);
-
-esp_err_t read_register(uint8_t reg, uint8_t* value);
+void SPI_Config();
 
 void Pin_CSN(int x);
 
-void config_sender(uint8_t payload_size);
+void Pin_CE(int x);
 
-void send(uint8_t senddata, uint8_t payload_size);
+void Register_Config(uint8_t channel, uint8_t payload);
+
+void configRegister(uint8_t reg, uint8_t value);
+
+uint8_t spi_transfer(uint8_t address);
+
+bool spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength );
+
+void WriteRegister(uint8_t reg, uint8_t * value, uint8_t len);
+
+void ReadRegister(uint8_t reg, uint8_t * value, uint8_t len);
+
+void powerUpRx();
+
+void powerUpTx();
+
+esp_err_t setTADDR(uint8_t * adr);
+
+void Send_data(uint8_t * value, uint8_t payload);
+
+uint8_t GetStatus();
