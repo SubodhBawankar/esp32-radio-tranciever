@@ -25,8 +25,8 @@ void Transmitter(){
 		while(1) { vTaskDelay(1); }
 	}
     else{
-        while (1)
-        {
+        while (1){
+            
             ESP_LOGI(TAG, "Done Till now");
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
@@ -35,14 +35,7 @@ void Transmitter(){
                 Send_data(&mydata, payload);
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-                ESP_LOGI(pcTaskGetName(0), "Wait for sending.....");
-                /*
-                if (Nrf24_isSend(&dev)) {
-                    ESP_LOGI(pcTaskGetName(0),"Send success:%lu", mydata.now_time);
-                } else {
-                    ESP_LOGW(pcTaskGetName(0),"Send fail:");
-                }
-                */
+                ESP_LOGI(pcTaskGetName(0), "Data Send ------");
                 vTaskDelay(1000/portTICK_PERIOD_MS);
 	        }
 
@@ -52,13 +45,60 @@ void Transmitter(){
 }
 
 
+
+
+void Reciever(){
+    SPI_Config();
+    uint8_t reci_data[30];
+    
+    uint8_t payload = sizeof(reci_data);
+    uint8_t channel = 90;
+    Register_Config(channel, payload);
+    
+    esp_err_t ret = setRADDR( (uint8_t *)"FGHIJ" );
+	if (ret != ESP_OK) {
+		ESP_LOGE(pcTaskGetName(0), "nrf24l01 not installed");
+		while(1) { vTaskDelay(1); }
+	}
+    
+    while(1){
+        if(data_ready()){ //data is ready
+
+            // code to read data
+            Get_Data(&reci_data, payload);
+            ESP_LOGI(TAG, "\nRecieved data is: %s", reci_data);
+            
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+}
+
 void app_main(void){
-    xTaskCreate(
-        Transmitter,
-        "Transmitter",
-        1024*3,
-        NULL,
-        2,
-        NULL
-    );
+
+    char choice;
+    ESP_LOGI(TAG, "Enter 1 for Transmitter and 0 for Reciever");
+    // scanf("%d", &choice);
+    // choice = fscanf(stdin);
+    choice = 0;
+    if(choice == 1){
+        xTaskCreate(
+            Transmitter,
+            "Transmitter",
+            1024*3,
+            NULL,
+            2,
+            NULL
+        );
+    }
+    else if(choice == 0){
+        xTaskCreate(
+            Reciever,
+            "Reciever",
+            1024*3,
+            NULL,
+            2,
+            NULL
+        );
+    }
 }

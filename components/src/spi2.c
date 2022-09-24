@@ -151,6 +151,8 @@ esp_err_t setTADDR(uint8_t * adr)
 	esp_err_t ret = ESP_OK;
 	WriteRegister(RX_ADDR_P0, adr, mirf_ADDR_LEN);
 	WriteRegister(TX_ADDR, adr, mirf_ADDR_LEN);
+	
+	// this to verity whether address is properly set or not
 	uint8_t buffer[5];
 	ReadRegister(RX_ADDR_P0, buffer, sizeof(buffer));
 	//ESP_LOGI(TAG, "Buffer = %x", buffer);
@@ -173,14 +175,13 @@ void Send_data(uint8_t * value, uint8_t payload){
 	{
 		vTaskDelay( 1000 / portTICK_PERIOD_MS);
 		status = GetStatus();
-		if ((status & ((1 << TX_DS)  | (1 << MAX_RT))))
-		{
+		printf("\nStatus: %d\n", status);
+		
+		if((status & 0x20) == 0x00){
 			PTX = 0;
 			break;
 		}
 	}
-	
-
 
     Pin_CE(0);
     powerUpTx(); // Set to transmitter mode , Power up
@@ -202,11 +203,65 @@ void Send_data(uint8_t * value, uint8_t payload){
     spi_write_byte(value, payload); // Write payload
 	Pin_CSN(1); // Pull up chip select
     Pin_CE(1); // Start transmission
-
+	
 }
 
 uint8_t GetStatus() {
 	uint8_t rv;
 	ReadRegister(STATUS, &rv, 1);
 	return rv;
+}
+
+uint8_t GetFIFOStatus() {
+	uint8_t rv;
+	ReadRegister(FIFO_STATUS, &rv, 1);
+	return rv;
+}
+
+void Recieve_data(){
+	//code
+}
+
+esp_err_t setRADDR(uint8_t * adr){
+	esp_err_t ret = ESP_OK;
+
+	WriteRegister(RX_ADDR_P1, adr, mirf_ADDR_LEN);
+
+	// this to verity whether address is properly set or not
+	uint8_t buffer[5];
+	ReadRegister(RX_ADDR_P1, buffer, sizeof(buffer));
+	//ESP_LOGI(TAG, "Buffer = %x", buffer);
+	ESP_LOGI(TAG, "Buffer = %d", *buffer);
+    for (int i=0;i<5;i++) {
+		ESP_LOGI(TAG, "adr[%d]=0x%xRX_ADDR_P1 buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
+		// if (adr[i] != buffer[i]) ret = ESP_FAIL;
+	}
+	return ret;
+}
+
+bool data_ready(){
+	uint8_t fstatus;
+	fstatus = GetFIFOStatus();
+	printf("\nFifo Status: %d\n", fstatus);
+
+	if((fstatus & 0x03) == 0x02){
+		ESP_LOGI(TAG, "Data Ready in RX FIFO");
+		return true;
+	}
+	else{
+		ESP_LOGI(TAG, "Waiting for data.");
+		return false;
+	}
+}
+
+void Get_Data(uint8_t * reci_mydata, uint8_t payload){
+	Pin_CSN(0);
+	
+	spi_transfer(R_RX_PAYLOAD ); // Send cmd to read rx payload
+	
+	spi_read_byte(reci_mydata, reci_mydata, payload); // Read payload
+	
+	Pin_CSN(1); // Pull up chip select
+
+	configRegister(STATUS, (1 << RX_DR));
 }
