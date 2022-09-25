@@ -92,20 +92,33 @@
 #define RF_PWR_LOW  1
 #define RF_PWR_HIGH 2
 
+#define ADD_LEN 5
+//#define NEW_CONFIG 
+
+#define RF24_PA_MIN = 0
+#define RF24_PA_LOW
+#define RF24_PA_HIGH
+#define RF24_PA_MAX
+#define RF24_PA_ERROR
+#define RF24_1MBPS = 0
+#define RF24_2MBPS
+#define RF24_250KBPS
+#define RF24_CRC_DISABLED = 0
+#define RF24_CRC_8
+#define RF24_CRC_16
+
 //Pin Definitions
 #define CE 16
 #define CSN 17
 #define MISO 19
 #define MOSI 23
 #define SCK 18 
-#define channel 1
-#define payload 16 
-#define PTX 
 //# define CE
 
+void *memset(void *str, int c, size_t n);
 esp_err_t spi_config();//Congiguration of esp32 spi pins
-esp_err_t send_data(uint8_t data_s, size_t size);
-esp_err_t receive_data(uint8_t data_r, size_t size);
+esp_err_t send_data(uint8_t* data_s, uint8_t len);
+esp_err_t receive_data(uint8_t* Data_in, uint8_t* Data_out, size_t DLen);
 uint8_t transfer_data(uint8_t address);//spi_transfer
 void CSN_Low();//spi_csnLow
 void CSN_High();//spi_csnHi
@@ -116,6 +129,7 @@ void Send(uint8_t *value);//Nrf24_send
 esp_err_t set_R_Add(uint8_t * adr);//Nrf24_setRADDR
 esp_err_t set_T_Add( uint8_t * adr);//Nrf24_setTADDR
 uint8_t def_datapipe();//Nrf24_getDataPipe
+extern bool Data_Ready();
 void get_data(uint8_t * data);//Nrf24_getData
 uint8_t get_Status();//Nrf24_getStatus
 void Config_reg(uint8_t reg, uint8_t value);//Nrf24_configRegister
