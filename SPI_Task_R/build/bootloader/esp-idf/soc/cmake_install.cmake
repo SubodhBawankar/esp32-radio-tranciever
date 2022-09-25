@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/SPI_Task_R/build/bootloader/esp-idf/soc/esp32/cmake_install.cmake")
+  include("/home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/SPI_Task_R/build/bootloader/esp-idf/soc/esp32/cmake_install.cmake")
 
 endif()
 

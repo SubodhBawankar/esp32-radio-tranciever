@@ -1,4 +1,4 @@
-# Install script for directory: /home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/components
+# Install script for directory: /home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/components
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -1566,7 +1566,7 @@ rule C_STATIC_LIBRARY_LINKER____idf_components
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake -S/home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/SPI_Task_R -B/home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/SPI_Task_R/build
+  command = /usr/bin/cmake -S/home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/SPI_Task_R -B/home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/SPI_Task_R/build
   description = Re-running CMake...
   generator = 1
 

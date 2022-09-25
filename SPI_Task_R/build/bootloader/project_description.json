@@ -1,8 +1,8 @@
 {
     "project_name":       "bootloader",
     "project_path":       "/home/janhavi/esp/esp-idf/components/bootloader/subproject",
-    "build_dir":          "/home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/SPI_Task_R/build/bootloader",
-    "config_file":        "/home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/SPI_Task_R/sdkconfig",
+    "build_dir":          "/home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/SPI_Task_R/build/bootloader",
+    "config_file":        "/home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/SPI_Task_R/sdkconfig",
     "config_defaults":    "",
     "app_elf":            "bootloader.elf",
     "app_bin":            "bootloader.bin",

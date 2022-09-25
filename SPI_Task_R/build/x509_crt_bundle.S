@@ -1,4 +1,4 @@
-/* * Data converted from /home/janhavi/Desktop/New_Git_Repo/esp32-radio-tranciever/SPI_Task_R/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /home/janhavi/Desktop/Git_Repo/esp32-radio-tranciever/SPI_Task_R/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 .section .rodata.embedded
