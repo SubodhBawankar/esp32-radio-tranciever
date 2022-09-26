@@ -12,7 +12,7 @@ static const char* TAG = "Communication.c";
 
 void Transmitter(){
     SPI_Config();
-    uint8_t mydata = 128;
+    int mydata = 128;
     ESP_LOGI(TAG, "\nMy data is: %d", mydata);
     uint8_t payload = sizeof(mydata);
     uint8_t channel = 90;

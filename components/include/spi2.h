@@ -138,7 +138,7 @@ void powerUpTx();
 
 esp_err_t setTADDR(uint8_t * adr);
 
-void Send_data(uint8_t * value, uint8_t payload);
+void Send_data(int * value, uint8_t payload);
 
 uint8_t GetStatus();
 
@@ -149,3 +149,5 @@ bool data_ready();
 void Get_Data(uint8_t payload);
 
 uint8_t GetFIFOStatus();
+
+bool spi_send_byte(int* Dataout, size_t DataLength );

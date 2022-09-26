@@ -164,7 +164,24 @@ esp_err_t setTADDR(uint8_t * adr)
 	return ret;
 }
 
-void Send_data(uint8_t * value, uint8_t payload){
+
+bool spi_send_byte(int* Dataout, size_t DataLength )
+{
+	spi_transaction_t SPITransaction;
+
+	if ( DataLength > 0 ) {
+		memset( &SPITransaction, 0, sizeof( spi_transaction_t ) );
+		SPITransaction.length = DataLength * 8;
+		SPITransaction.tx_buffer = Dataout;
+		SPITransaction.rx_buffer = NULL;
+		spi_device_transmit( handle, &SPITransaction );
+	}
+
+	return true;
+}
+
+
+void Send_data(int * value, uint8_t payload){
 
 	/*
 	uint8_t status;
@@ -217,7 +234,7 @@ void Send_data(uint8_t * value, uint8_t payload){
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     Pin_CSN(0);
-    spi_write_byte(value, payload); // Write payload
+    spi_send_byte(value, payload); // Write payload
 	Pin_CSN(1); // Pull up chip select
     Pin_CE(1); // Start transmission
 	
@@ -277,6 +294,6 @@ void Get_Data(uint8_t payload){
 	spi_transfer(R_RX_PAYLOAD ); // Send cmd to read rx payload
 	spi_read_byte(&reci_mydata, &reci_mydata, payload); // Read payload
 	Pin_CSN(1); // Pull up chip select
-	configRegister(STATUS, (1 << RX_DR));
+	// configRegister(STATUS, (1 << RX_DR));
 	printf("Data: %d\n", reci_mydata);
 }
