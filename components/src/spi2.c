@@ -166,6 +166,23 @@ esp_err_t setTADDR(uint8_t * adr)
 
 void Send_data(uint8_t * value, uint8_t payload){
 
+	/*
+	uint8_t status;
+	int PTX = 1;
+	status = GetStatus();
+	while (PTX) // Wait until last paket is send
+	{
+		vTaskDelay(100 / portTICK_PERIOD_MS);
+		status = GetStatus();
+		if ((status & ((1 << TX_DS)  | (1 << MAX_RT))))
+		{
+			PTX = 0;
+			configRegister(STATUS, (1 << TX_DS) | (1 << MAX_RT));
+			break;
+		}
+	}
+	*/
+
 	int PTX = 1; 
 	uint8_t status;
 	status = GetStatus();
@@ -254,14 +271,12 @@ bool data_ready(){
 	}
 }
 
-void Get_Data(uint8_t * reci_mydata, uint8_t payload){
+void Get_Data(uint8_t payload){
+	uint8_t reci_mydata;
 	Pin_CSN(0);
-	
 	spi_transfer(R_RX_PAYLOAD ); // Send cmd to read rx payload
-	
-	spi_read_byte(reci_mydata, reci_mydata, payload); // Read payload
-	
+	spi_read_byte(&reci_mydata, &reci_mydata, payload); // Read payload
 	Pin_CSN(1); // Pull up chip select
-
 	configRegister(STATUS, (1 << RX_DR));
+	printf("Data: %d\n", reci_mydata);
 }

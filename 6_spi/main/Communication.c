@@ -12,31 +12,28 @@ static const char* TAG = "Communication.c";
 
 void Transmitter(){
     SPI_Config();
-    uint8_t mydata[30] = "HelloWorld";
-    ESP_LOGI(TAG, "\nMy data is: %s", mydata);
+    uint8_t mydata = 128;
+    ESP_LOGI(TAG, "\nMy data is: %d", mydata);
     uint8_t payload = sizeof(mydata);
     uint8_t channel = 90;
-    // Nrf24_config(&dev, channel, payload);
     Register_Config(channel, payload);
     
-    esp_err_t ret = setTADDR( (uint8_t *)"FGHIJ" );
+    esp_err_t ret = setTADDR((uint8_t *)"FGHIJ");
 	if (ret != ESP_OK) {
-		ESP_LOGE(pcTaskGetName(0), "nrf24l01 not installed");
+		ESP_LOGE(TAG, "nrf24l01 not installed");
 		while(1) { vTaskDelay(1); }
 	}
     else{
+        ESP_LOGI(TAG, "Done Till now");
         while (1){
             
-            ESP_LOGI(TAG, "Done Till now");
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
             ESP_LOGI(TAG, "Sending Data");
             while(1) {
                 Send_data(&mydata, payload);
-                vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-                ESP_LOGI(pcTaskGetName(0), "Data Send ------");
-                vTaskDelay(1000/portTICK_PERIOD_MS);
+                ESP_LOGI(TAG, "Data Send ------");
+                vTaskDelay(3000/portTICK_PERIOD_MS);
 	        }
 
         }
@@ -49,7 +46,7 @@ void Transmitter(){
 
 void Reciever(){
     SPI_Config();
-    uint8_t reci_data[30];
+    uint8_t reci_data;
     
     uint8_t payload = sizeof(reci_data);
     uint8_t channel = 90;
@@ -62,11 +59,12 @@ void Reciever(){
 	}
     
     while(1){
-        if(data_ready()){ //data is ready
+        if(true){ //data is ready
 
             // code to read data
-            Get_Data(&reci_data, payload);
-            ESP_LOGI(TAG, "\nRecieved data is: %s", reci_data);
+            data_ready();
+            Get_Data(payload);
+            // ESP_LOGI(TAG, "\nRecieved data is: %s", reci_data);
             
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -80,7 +78,7 @@ void app_main(void){
     ESP_LOGI(TAG, "Enter 1 for Transmitter and 0 for Reciever");
     // scanf("%d", &choice);
     // choice = fscanf(stdin);
-    choice = 0;
+    choice = 1;
     if(choice == 1){
         xTaskCreate(
             Transmitter,

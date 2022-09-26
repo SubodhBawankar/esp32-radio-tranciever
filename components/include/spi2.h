@@ -146,6 +146,6 @@ esp_err_t setRADDR(uint8_t * adr);
 
 bool data_ready();
 
-void Get_Data(uint8_t * reci_mydata, uint8_t payload);
+void Get_Data(uint8_t payload);
 
 uint8_t GetFIFOStatus();
