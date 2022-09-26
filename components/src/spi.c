@@ -34,7 +34,8 @@ esp_err_t spi_config()
   bus_config.max_transfer_sz = 4092;
   bus_config.quadwp_io_num = -1;
   bus_config.quadhd_io_num = -1;
-  ret = spi_bus_initialize(SPI2_HOST, &bus_config, 0);
+  ret = spi_bus_initialize(SPI2_HOST, &bus_config, SPI_DMA_CH_AUTO);
+  
   ESP_LOGI(TAG1, "Initialized SPI Bus %d",ret);
  
   assert(ret==ESP_OK);
