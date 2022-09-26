@@ -13,7 +13,7 @@
 #include "spi.h"
 
 # define static const char* TAG = "Communication status";
-uint8_t value[4];
+uint8_t value[50];
 
 void Receiver()
 {

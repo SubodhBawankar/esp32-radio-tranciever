@@ -1038,3 +1038,14 @@
 12298	12577	1664119615280576241	spi_communication.elf	19201899ca88892e
 12577	12668	1664119615376576711	.bin_timestamp	e60fd28f1ec1ef33
 12668	12692	0	esp-idf/esptool_py/CMakeFiles/app_check_size	87c8c52074bd523
+0	3690	1664214714849954767	build.ninja	deb4c809fb40e3bc
+14	61	1664214714981955413	esp-idf/app_update/CMakeFiles/__idf_app_update.dir/esp_app_desc.c.obj	2cec81cd1ca9d12c
+61	74	1664214714993955471	esp-idf/app_update/libapp_update.a	99c724cbed46f960
+14	75	1664119608264541942	bootloader-prefix/src/bootloader-stamp/bootloader-build	f3ee5f46d254898d
+14	75	1664119608264541942	bootloader/bootloader.elf	f3ee5f46d254898d
+14	75	1664119608264541942	bootloader/bootloader.bin	f3ee5f46d254898d
+14	75	1664119608264541942	bootloader/bootloader.map	f3ee5f46d254898d
+75	1300	1664214716197961357	esp-idf/esp_system/ld/sections.ld	5626fb7db9b6952a
+1300	1740	1664214716653963587	spi_communication.elf	19201899ca88892e
+1740	1880	1664214716797964291	.bin_timestamp	e60fd28f1ec1ef33
+1880	1915	0	esp-idf/esptool_py/CMakeFiles/app_check_size	87c8c52074bd523

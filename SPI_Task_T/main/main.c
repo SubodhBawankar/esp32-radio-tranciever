@@ -9,10 +9,12 @@
 
 #include "spi.h"
 
+uint8_t value[50]="Hello World"; 
+
 void Transmittor()
 {
     ESP_LOGI(pcTaskGetName(0), "Start");
-	uint8_t pl = sizeof(mydata.value);
+	uint8_t pl = sizeof(value);
 	uint8_t ch = 90;
 	Config_nRF(ch, pl);
 
@@ -28,7 +30,7 @@ void Transmittor()
     
     while(1)
     {
-		Send(mydata.value);
+		Send(value);
 		vTaskDelay(1);
 
 		ESP_LOGI(pcTaskGetName(0), "Wait for sending.....");
@@ -50,5 +52,5 @@ void Transmittor()
  
 void app_main()
 {
-    xTaskCreate(transmitter, "TRANSMITTER", 1024*3, NULL, 2, NULL);
+    xTaskCreate(Transmittor, "TRANSMITTER", 1024*3, NULL, 2, NULL);
 }
