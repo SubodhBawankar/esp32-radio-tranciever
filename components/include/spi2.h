@@ -103,8 +103,8 @@
 #define RF_PWR_HIGH 2
 
 
-#define mirf_ADDR_LEN    5                        //Device addrees length:3~5 bytes
-#define mirf_CONFIG ((1<<EN_CRC) | (0<<CRCO) ) //enable CRC and CRC data len=1;mirf_CONFIG ==1000B
+#define mirf_ADDR_LEN    5
+#define mirf_CONFIG ((1<<EN_CRC) | (0<<CRCO) )
 
 
 /* Pins Definations */
@@ -146,8 +146,12 @@ esp_err_t setRADDR(uint8_t * adr);
 
 bool data_ready();
 
-void Get_Data(uint8_t payload);
+void Get_Data(int * reci_data, uint8_t payload);
 
 uint8_t GetFIFOStatus();
 
 bool spi_send_byte(int* Dataout, size_t DataLength );
+
+bool spi_recieve_byte(int* Datain, int* Dataout, size_t DataLength);
+
+bool isSend();
