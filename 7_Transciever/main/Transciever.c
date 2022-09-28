@@ -4,11 +4,14 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "driver/gpio.h"
 #include "esp_log.h"
 
+#include "switch.h"
 #include "spi2.h"
 
-static const char* TAG = "Communication.c";
+
+static const char* TAG = "Transciever";
 
 void Transmitter(){
     SPI_Config();
@@ -72,30 +75,33 @@ void Reciever(){
 }
 
 void app_main(void){
+    enable_switches();
 
-    char choice;
-    ESP_LOGI(TAG, "Enter 1 for Transmitter and 0 for Reciever");
-    // scanf("%d", &choice);
-    // choice = fscanf(stdin);
-    choice = 0;
-    if(choice == 1){
-        xTaskCreate(
-            Transmitter,
-            "Transmitter",
-            1024*3,
-            NULL,
-            2,
-            NULL
-        );
-    }
-    else if(choice == 0){
-        xTaskCreate(
-            Reciever,
-            "Reciever",
-            1024*3,
-            NULL,
-            2,
-            NULL
-        );
+    while(1){
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        if(read_switch(SWITCH_1)){
+            ESP_LOGI(TAG, "Switch 1: Transmitter Code");
+            xTaskCreate(
+                Transmitter,
+                "Transmitter",
+                1024*3,
+                NULL,
+                2,
+                NULL
+            );
+        }
+
+        else if(read_switch(SWITCH_2)){
+            ESP_LOGI(TAG, "Switch 2: Reciever Code");
+            xTaskCreate(
+                Reciever,
+                "Reciever",
+                1024*3,
+                NULL,
+                2,
+                NULL
+            );
+        }
     }
 }
