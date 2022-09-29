@@ -165,7 +165,7 @@ esp_err_t setTADDR(uint8_t * adr)
 }
 
 
-bool spi_send_byte(uint8_t* Dataout, size_t DataLength )
+bool spi_send_byte(int* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -181,7 +181,7 @@ bool spi_send_byte(uint8_t* Dataout, size_t DataLength )
 }
 
 
-void Send_data(uint8_t * value, uint8_t payload){
+void Send_data(int * value, uint8_t payload){
 
 	
 	uint8_t status;

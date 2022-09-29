@@ -15,9 +15,9 @@ static const char* TAG = "Transciever";
 
 void Transmitter(){
     SPI_Config();
-    uint8_t mydata[3];
+    int mydata[3];
     mydata[0] = 128;
-    ESP_LOGI(TAG, "\nMy data is: %d", (int )mydata);
+    ESP_LOGI(TAG, "\nMy data is: %d", mydata);
     uint8_t payload = sizeof(mydata);
     uint8_t channel = 50;
     Register_Config(channel, payload);
