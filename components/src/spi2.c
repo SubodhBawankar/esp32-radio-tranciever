@@ -306,7 +306,7 @@ bool data_ready(){
 	}
 }
 
-void Get_Data(uint8_t * reci_data, uint8_t payload){
+void Get_Data(int * reci_data, uint8_t payload){
 	// int reci_mydata;
 	Pin_CSN(0);
 	spi_transfer(R_RX_PAYLOAD); // Send cmd to read rx payload

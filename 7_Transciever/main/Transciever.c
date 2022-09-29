@@ -15,14 +15,13 @@ static const char* TAG = "Transciever";
 
 void Transmitter(){
     SPI_Config();
-    int mydata[3];
-    mydata[0] = 128;
+    int mydata = 128;
     ESP_LOGI(TAG, "\nMy data is: %d", mydata);
     uint8_t payload = sizeof(mydata);
     uint8_t channel = 50;
     Register_Config(channel, payload);
     
-    esp_err_t ret = setTADDR( (uint8_t *)"SRAVJ");
+    esp_err_t ret = setTADDR( (uint8_t *)"ARYAN");
 	if (ret != ESP_OK) {
 		ESP_LOGE(TAG, "nrf24l01 not installed");
 		while(1) { vTaskDelay(1); }
@@ -49,14 +48,14 @@ void Transmitter(){
 
 void Reciever(){
     SPI_Config();
-    uint8_t reci_data[3];
+    int reci_data;
     // int reci_data[3];
     
     uint8_t payload = sizeof(reci_data);
     uint8_t channel = 50;
     Register_Config(channel, payload);
     
-    esp_err_t ret = setRADDR( (uint8_t *)"SRAVJ" );
+    esp_err_t ret = setRADDR( (uint8_t *)"ARYAN" );
 	if (ret != ESP_OK) {
 		ESP_LOGE(pcTaskGetName(0), "nrf24l01 not installed");
 		while(1) { vTaskDelay(1); }
@@ -67,7 +66,7 @@ void Reciever(){
 
             // code to read data
             Get_Data(&reci_data, payload);
-            ESP_LOGI(TAG, "\nRecieved data is: %d", (int )reci_data[0]);
+            ESP_LOGI(TAG, "\nRecieved data is: %d", reci_data);
             
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
