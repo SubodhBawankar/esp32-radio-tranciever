@@ -16,7 +16,7 @@ static const char* TAG = "Transciever";
 void Transmitter(){
     SPI_Config();
     uint8_t mydata[4]; 
-    mydata[0] = 0b00000101;
+    mydata[0] = "128";
     // char hel[10] = "Hello World";
     ESP_LOGI(TAG, "\nMy data is: %s", (char *)mydata);
     // ESP_LOGI(TAG, "\nMy String is: %s", hel);
