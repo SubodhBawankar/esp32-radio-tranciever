@@ -93,6 +93,7 @@
 #define RF_PWR_HIGH 2
 
 #define ADD_LEN 5
+#define NEW_CONFIG ((1<<EN_CRC) | (0<<CRCO) )
 //#define NEW_CONFIG 
 
 #define RF24_PA_MIN = 0
@@ -113,18 +114,20 @@
 #define MISO 19
 #define MOSI 23
 #define SCK 18 
+
 //# define CE
 
 void *memset(void *str, int c, size_t n);
-esp_err_t spi_config();//Congiguration of esp32 spi pins
-esp_err_t send_data(uint8_t* data_s, uint8_t len);
-esp_err_t receive_data(uint8_t* Data_in, uint8_t* Data_out, size_t DLen);
+void spi_config();//Congiguration of esp32 spi pins
+bool write_data(uint8_t* data_s, uint8_t len);
+bool read_data(uint8_t* Data_in, uint8_t* Data_out, size_t DLen);
 uint8_t transfer_data(uint8_t address);//spi_transfer
 void CSN_Low();//spi_csnLow
 void CSN_High();//spi_csnHi
 void CE_Low();
 void CE_High();
 void Config_nRF(uint8_t ch, uint8_t pl);//Nrf24_config
+bool Sending();
 void Send(uint8_t *value);//Nrf24_send
 esp_err_t set_R_Add(uint8_t * adr);//Nrf24_setRADDR
 esp_err_t set_T_Add( uint8_t * adr);//Nrf24_setTADDR
@@ -135,6 +138,7 @@ uint8_t get_Status();//Nrf24_getStatus
 void Config_reg(uint8_t reg, uint8_t value);//Nrf24_configRegister
 void Read_reg(uint8_t reg, uint8_t * value, uint8_t len);//Nrf24_readRegister
 void Write_reg(uint8_t reg, uint8_t * value, uint8_t len);//Nrf24_writeRegister
+//void Print_Det();
 void PWR_RX();//Nrf24_powerUpRx
 void PWR_TX();//Nrf24_powerUpTx
 void PWR_DWN();//Nrf24_powerDown

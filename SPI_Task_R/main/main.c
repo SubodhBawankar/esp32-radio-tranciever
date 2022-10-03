@@ -8,22 +8,24 @@
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
 #include "esp_log.h"
-#include "esp_err.h"
 
 #include "spi.h"
 
-# define static const char* TAG = "Communication status";
-uint8_t value[50];
+static const char* TAG = "Communication status";
+uint8_t value[10];
+uint8_t pl = sizeof(value);
+uint8_t ch = 50;
+//unsigned long now_time;
 
 void Receiver()
 {
     ESP_LOGI(pcTaskGetName(0), "Start");
     spi_config();
-    uint8_t pl = sizeof(value);
-    uint8_t ch = 90;
+    ESP_LOGI(TAG,"channel:%d \nSize of value: %d",ch,pl);
+    //printf("channel:%s \n size of value: %s",ch,pl);
     Config_nRF(ch,pl);
 
-    esp_err_t ret = set_R_Add((uint8_t *)"FGHIJ");
+    esp_err_t ret = set_R_Add((uint8_t *)"SRAVJ");
     if(ret != ESP_OK)
     {
         ESP_LOGE(pcTaskGetName(0), "ERROR:nrf24l01 not installed");
@@ -31,14 +33,23 @@ void Receiver()
         {
             vTaskDelay(1);
         }
+    }
+    else
+    {
+        ESP_LOGI(TAG , "Started Recieving");
         while(1)
         {
-          if(Data_Ready())
+          if(Data_Ready()==1)
           {
             get_data(value);
+            ESP_LOGI(pcTaskGetName(0), "Received Data:%s", value);
            // ESP_LOGI(pcTaskGetName(0), "Received Data:%lu", mydata.now_time);
           }
-          vTaskDelay(1);
+          else
+          {
+            ESP_LOGI(TAG, "Data not received");
+          }
+          vTaskDelay(1000/ portTICK_PERIOD_MS);
         }
     }
 }
