@@ -12,7 +12,7 @@ Make a long range Transceiver using ESP32 boards and send control commands as we
   - [Technical Specifications](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#technical-specifications)
 - [Getting started](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#getting-started)
   - [Required installations](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#required-installations)
- - [Project Installations](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#project-installations)
+  - [Project Installations](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#project-installations)
 - [Resources](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#resources)
 - [Acknowledgement](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#acknowledgement)
 - [Contributors](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#contributors)
