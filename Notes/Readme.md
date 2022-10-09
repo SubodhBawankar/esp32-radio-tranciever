@@ -3,7 +3,7 @@ Make a long range Transceiver using ESP32 boards and send control commands as we
 
 ## Table of Content
 - [esp-32_Radio-Transceiver](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#esp-32_radio-transceiver)
-- [Table of Content](https://github.com/SubodhBawankar/esp32-radio-tranciever/edit/Mentee-Janhavi/Notes/Readme.md#table-of-content)
+- [Table of Content](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#table-of-content)
 - [Project Details](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#project-details)
 - [SPI Communication Protocol](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#spi-communication-protocol)
 - [nRF24L01](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#nrf24l01)
