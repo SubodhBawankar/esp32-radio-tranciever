@@ -1,13 +1,29 @@
 # esp-32_Radio-Transceiver
 Make a long range Transceiver using ESP32 boards and send control commands as well as messages over a long range of about 1km.
 
+## Table of Content
+- [esp-32_Radio-Transceiver](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#esp-32_radio-transceiver)
+- [Table of Content](https://github.com/SubodhBawankar/esp32-radio-tranciever/edit/Mentee-Janhavi/Notes/Readme.md#table-of-content)
+- [Project Details](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#project-details)
+- [SPI Communication Protocol](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#spi-communication-protocol)
+- [nRF24L01](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#nrf24l01)
+  - [Pin Configuration](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#pin-configuration)
+  - [Circuit Diagram](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#circuit-diagram)
+  - [Technical Specifications](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#technical-specifications)
+- [Getting started](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#getting-started)
+  - [Required installations](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#required-installations)
+ - [Project Installations](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#project-installations)
+- [Resources](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#resources)
+- [Acknowledgement](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#acknowledgement)
+- [Contributors](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#contributors)
+- [License](https://github.com/SubodhBawankar/esp32-radio-tranciever/blob/Mentee-Janhavi/Notes/Readme.md#license)
+
 ## Project Details
 **Technologies and languages used**
 - Free RTOS
 - ESP-idf
 - C
 - CMake
-<br>
 
 ## SPI Communication Protocol
 1. SPI is Serial Peripheral Interface. It is a synchronous type of communication protocol.
@@ -24,8 +40,6 @@ Make a long range Transceiver using ESP32 boards and send control commands as we
 - The data is transferred from the master to the slave through the **MOSI line**.
 - If slave needs to respond to the master, it uses the **MISO line**. <br>
 ![SPI](Images/SPI.png)<br>
-
-<br>
 
 ## nRF24L01
 ![nRF24L01 Sensor Module](Images/NRF24L01.png)<br>
@@ -69,8 +83,6 @@ The connections to be done with esp32 microcontroller to establish communication
 - Power Supply Range : 1.9V to 3.6V
 
 _For further information refer [Datasheet](https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf)_
-
-<br>
 
 ## Getting Started 
 ### Required installations 
