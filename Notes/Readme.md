@@ -98,7 +98,7 @@ _For further information refer [Datasheet](https://www.sparkfun.com/datasheets/C
 
 ## Acknowledgement
 [SRA VJTI](https://github.com/SRA-VJTI)<br>
-Special acknowledgements to [Moteen Shah](https://github.com/Jamm02) [Chinmay Lonkar](https://github.com/ChinmayLonkar)<br>
+Special acknowledgements to [Moteen Shah](https://github.com/Jamm02)    [Chinmay Lonkar](https://github.com/ChinmayLonkar)<br>
 
 ## Contributors
 [Aryan Bawankar](https://github.com/SubodhBawankar)<br>
