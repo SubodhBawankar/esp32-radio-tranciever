@@ -101,7 +101,7 @@ _For further information refer [Datasheet](https://www.sparkfun.com/datasheets/C
 ## Resources
 [ESP-IDF API Reference](https://docs.espressif.com/projects/esp-idf/en/v4.2.4/esp32/api-reference/index.html)<br>
 [nRF24L01 Datasheet](https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf)<br>
-[Reference](https://github.com/nopnop2002/esp-idf-mirf.git)
+[Reference](https://github.com/nopnop2002/esp-idf-mirf.git)<br>
 [SPI Communication Protocol](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/spi_master.html)
 
 ## Acknowledgement
