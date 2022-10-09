@@ -8,11 +8,6 @@ Make a long range Transceiver using ESP32 boards and send control commands as we
 - C
 - CMake
 <br>
-<br>
-
-**File Structure**<br>
-
-**Code Flow**<br>
 
 ## SPI Communication Protocol
 1. SPI is Serial Peripheral Interface. It is a synchronous type of communication protocol.
@@ -98,7 +93,7 @@ _For further information refer [Datasheet](https://www.sparkfun.com/datasheets/C
 
 ## Acknowledgement
 [SRA VJTI](https://github.com/SRA-VJTI)<br>
-Special acknowledgements to [Moteen Shah](https://github.com/Jamm02)    [Chinmay Lonkar](https://github.com/ChinmayLonkar)<br>
+Special acknowledgements to [Moteen Shah](https://github.com/Jamm02) , [Chinmay Lonkar](https://github.com/ChinmayLonkar)<br>
 
 ## Contributors
 [Aryan Bawankar](https://github.com/SubodhBawankar)<br>
