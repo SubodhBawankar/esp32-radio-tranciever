@@ -11,15 +11,12 @@
 
 static const char* TAG = "SPI2.c";
 
-struct spi_device_handle_t * handle;
-
 int PTX;
 
 
-void SPI_Config(){
+void SPI_Config(NRF24_t * dev){
     esp_err_t ret;
 
-	//gpio_pad_select_gpio(CONFIG_CSN_GPIO);
 	gpio_reset_pin(CSN);
     Pin_CSN(1);
 
@@ -37,18 +34,17 @@ void SPI_Config(){
 	spi_device_interface_config_t devcfg;
 	memset( &devcfg, 0, sizeof( spi_device_interface_config_t));
 	devcfg.clock_speed_hz = 4000000 ;
-	// It does not work with hardware CS control.
-	//devcfg.spics_io_num = csn_pin;
-	// It does work with software CS control.
 	devcfg.spics_io_num = -1;
 	devcfg.queue_size = 7;
 	devcfg.mode = 0;
 	devcfg.flags = SPI_DEVICE_NO_DUMMY;
 
+	spi_device_handle_t handle;
 	ret = spi_bus_add_device( SPI2_HOST, &devcfg, &handle);
 	ESP_LOGI(TAG, "spi_bus_add_device=%d",ret);
     ESP_LOGI(TAG, "SPI_CONFIG Done");
 
+	dev->_SPIHandle = handle;
     
 }
 
@@ -62,32 +58,31 @@ void Pin_CE(int x){
     gpio_set_level(CE, x);
 }
 
-void Register_Config(uint8_t channel, uint8_t payload){
-    configRegister(RF_CH, channel); // Set RF channel
+void Register_Config(NRF24_t * dev ,uint8_t channel, uint8_t payload){
+    configRegister(dev, RF_CH, channel); // Set RF channel
 
-	configRegister(RX_PW_P0, payload);
-	configRegister(RX_PW_P1, payload); // Set length of incoming payload
-    powerUpRx();
-    spi_transfer(FLUSH_RX);
+	configRegister(dev, RX_PW_P0, payload);
+	configRegister(dev, RX_PW_P1, payload); // Set length of incoming payload
+    powerUpRx(dev);
+    spi_transfer(dev, FLUSH_RX);
 }
 
-void configRegister(uint8_t reg, uint8_t value){
+void configRegister(NRF24_t * dev, uint8_t reg, uint8_t value){
     Pin_CSN(0);
-    spi_transfer(W_REGISTER | (REGISTER_MASK & reg));
-    spi_transfer(value);
+    spi_transfer(dev, W_REGISTER | (REGISTER_MASK & reg));
+    spi_transfer(dev, value);
     Pin_CSN(1);
 }
 
-uint8_t spi_transfer(uint8_t address) {
+uint8_t spi_transfer(NRF24_t * dev, uint8_t address) {
 	uint8_t datain[1];
 	uint8_t dataout[1];
 	dataout[0] = address;
-	//spi_write_byte(dev, dataout, 1 );
-	spi_read_byte(datain, dataout, 1 );
+	spi_read_byte(dev, datain, dataout, 1 );
 	return datain[0];
 }
 
-bool spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength )
+bool spi_read_byte(NRF24_t * dev, uint8_t* Datain, uint8_t* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -96,12 +91,12 @@ bool spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength )
 		SPITransaction.length = DataLength * 8;
 		SPITransaction.tx_buffer = Dataout;
 		SPITransaction.rx_buffer = Datain;
-		spi_device_transmit( handle, &SPITransaction );
+		spi_device_transmit( dev->_SPIHandle, &SPITransaction );
 	}
 	return true;
 }
 
-bool spi_write_byte(uint8_t* Dataout, size_t DataLength )
+bool spi_write_byte(NRF24_t * dev, uint8_t* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -110,62 +105,60 @@ bool spi_write_byte(uint8_t* Dataout, size_t DataLength )
 		SPITransaction.length = DataLength * 8;
 		SPITransaction.tx_buffer = Dataout;
 		SPITransaction.rx_buffer = NULL;
-		spi_device_transmit( handle, &SPITransaction );
+		spi_device_transmit( dev->_SPIHandle, &SPITransaction );
 	}
 
 	return true;
 }
 
-void WriteRegister(uint8_t reg, uint8_t * value, uint8_t len)
+void WriteRegister(NRF24_t * dev, uint8_t reg, uint8_t * value, uint8_t len)
 {
 	Pin_CSN(0);
-	spi_transfer(W_REGISTER | (REGISTER_MASK & reg));
-	spi_write_byte(value, len);
+	spi_transfer(dev, W_REGISTER | (REGISTER_MASK & reg));
+	spi_write_byte(dev, value, len);
 	Pin_CSN(1);
 
 }
 
-void ReadRegister(uint8_t reg, uint8_t * value, uint8_t len)
+void ReadRegister(NRF24_t * dev, uint8_t reg, uint8_t * value, uint8_t len)
 {
     Pin_CSN(0);
-	spi_transfer(R_REGISTER | (REGISTER_MASK & reg));
-	spi_read_byte(value, value, len);
+	spi_transfer(dev, R_REGISTER | (REGISTER_MASK & reg));
+	spi_read_byte(dev, value, value, len);
 	Pin_CSN(1);
 }
 
-void powerUpRx() {
+void powerUpRx(NRF24_t * dev) {
 	PTX = 0;
     Pin_CE(0);
-	configRegister(CONFIG, mirf_CONFIG | ( (1 << PWR_UP) | (1 << PRIM_RX) ) ); //set device as TX mode
+	configRegister(dev, CONFIG, mirf_CONFIG | ( (1 << PWR_UP) | (1 << PRIM_RX) ) ); //set device as TX mode
 	Pin_CE(1);
-	configRegister(STATUS, (1 << TX_DS) | (1 << MAX_RT)); //Clear seeded interrupt and max tx number interrupt
+	configRegister(dev, STATUS, (1 << TX_DS) | (1 << MAX_RT)); //Clear seeded interrupt and max tx number interrupt
 }
 
-void powerUpTx() {
+void powerUpTx(NRF24_t * dev) {
 	PTX = 1;
-	configRegister(CONFIG, mirf_CONFIG | ( (1 << PWR_UP) | (0 << PRIM_RX) ) );
+	configRegister(dev, CONFIG, mirf_CONFIG | ( (1 << PWR_UP) | (0 << PRIM_RX) ) );
 }
 
-esp_err_t setTADDR(uint8_t * adr)
+esp_err_t setTADDR(NRF24_t * dev, uint8_t * adr)
 {
 	esp_err_t ret = ESP_OK;
-	WriteRegister(RX_ADDR_P0, adr, mirf_ADDR_LEN);
-	WriteRegister(TX_ADDR, adr, mirf_ADDR_LEN);
+	WriteRegister(dev, RX_ADDR_P0, adr, mirf_ADDR_LEN);
+	WriteRegister(dev, TX_ADDR, adr, mirf_ADDR_LEN);
 	
 	// this to verity whether address is properly set or not
 	uint8_t buffer[5];
-	ReadRegister(RX_ADDR_P0, &buffer, sizeof(buffer));
-	//ESP_LOGI(TAG, "Buffer = %x", buffer);
-	ESP_LOGI(TAG, "Buffer = %d", *buffer);
+	ReadRegister(dev, RX_ADDR_P0, buffer, sizeof(buffer));
+	ESP_LOGI(TAG, "Buffer = 0x%x", buffer);
     for (int i=0;i<5;i++) {
 		ESP_LOGI(TAG, "adr[%d]=0x%x RX_ADDR_P0 buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
-		// if (adr[i] != buffer[i]) ret = ESP_FAIL;
 	}
 	return ret;
 }
 
 
-bool spi_send_byte(int* Dataout, size_t DataLength )
+bool spi_send_byte(NRF24_t * dev, uint8_t* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -174,22 +167,22 @@ bool spi_send_byte(int* Dataout, size_t DataLength )
 		SPITransaction.length = DataLength * 8;
 		SPITransaction.tx_buffer = Dataout;
 		SPITransaction.rx_buffer = NULL;
-		spi_device_transmit( handle, &SPITransaction );
+		spi_device_transmit( dev->_SPIHandle, &SPITransaction );
 	}
 
 	return true;
 }
 
 
-void Send_data(int * value, uint8_t payload){
+void Send_data(NRF24_t * dev, uint8_t * value, uint8_t payload){
 
 	
 	uint8_t status;
-	status = GetStatus();
+	status = GetStatus(dev);
 	while (PTX) // Wait until last paket is send
 	{
 		vTaskDelay(100 / portTICK_PERIOD_MS);
-		status = GetStatus();
+		status = GetStatus(dev);
 		printf("\nStatus: %d\n", status);
 		if ((status & ((1 << TX_DS))))
 		{
@@ -197,63 +190,39 @@ void Send_data(int * value, uint8_t payload){
 			break;
 		}
 	}
-	
-
-
-	/*
-	int PTX = 1; 
-	uint8_t status;
-	status = GetStatus();
-	
-	
-	while (PTX == 1) // Wait until last paket is send
-	{
-		vTaskDelay( 1000 / portTICK_PERIOD_MS);
-		status = GetStatus();
-		printf("\nStatus: %d\n", status);
-		
-		if((status & 0x20) == 0x00){
-			PTX = 0;
-			break;
-		}
-	}
-	*/
 
     Pin_CE(0);
-    powerUpTx(); // Set to transmitter mode , Power up
+    powerUpTx(dev); // Set to transmitter mode , Power up
     
     Pin_CSN(0); // Pull down chip select
-	spi_transfer(FLUSH_TX ); // Write cmd to flush tx fifo
+	spi_transfer(dev, FLUSH_TX ); // Write cmd to flush tx fifo
 	Pin_CSN(1); // Pull up chip select
 	
 
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-
     Pin_CSN(0); // Pull down chip select
-	spi_transfer(W_TX_PAYLOAD); // Write cmd to write payload
+	spi_transfer(dev, W_TX_PAYLOAD); // Write cmd to write payload
 	
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-    spi_send_byte(value, payload); // Write payload
+    spi_send_byte(dev, value, payload); // Write payload
 	Pin_CSN(1); // Pull up chip select
     Pin_CE(1); // Start transmission
 	
 }
 
 
-bool isSend(){
+bool isSend(NRF24_t * dev){
 	uint8_t status;
 	if (PTX) {
 		while(1) {
-			status = GetStatus();
+			status = GetStatus(dev);
 
 			if (status & (1 << TX_DS)) { // Data Sent TX FIFO interrup
-				powerUpRx();
+				powerUpRx(dev);
 				return true;
 			}
 
 			if (status & (1 << MAX_RT)) { // Maximum number of TX retries interrupt
-				powerUpRx();
+				powerUpRx(dev);
 				return false;
 			}
 			vTaskDelay(1);
@@ -262,38 +231,37 @@ bool isSend(){
 	return false;
 }
 
-uint8_t GetStatus() {
+uint8_t GetStatus(NRF24_t * dev) {
 	uint8_t rv;
-	ReadRegister(STATUS, &rv, 1);
+	ReadRegister(dev, STATUS, &rv, 1);
 	return rv;
 }
 
-uint8_t GetFIFOStatus() {
+uint8_t GetFIFOStatus(NRF24_t * dev) {
 	uint8_t rv;
-	ReadRegister(FIFO_STATUS, &rv, 1);
+	ReadRegister(dev, FIFO_STATUS, &rv, 1);
 	return rv;
 }
 
-esp_err_t setRADDR(uint8_t * adr){
+esp_err_t setRADDR(NRF24_t * dev, uint8_t * adr){
 	esp_err_t ret = ESP_OK;
 
-	WriteRegister(RX_ADDR_P1, adr, mirf_ADDR_LEN);
+	WriteRegister(dev, RX_ADDR_P1, adr, mirf_ADDR_LEN);
 
 	// this to verity whether address is properly set or not
 	uint8_t buffer[5];
-	ReadRegister(RX_ADDR_P1, buffer, sizeof(buffer));
+	ReadRegister(dev, RX_ADDR_P1, buffer, sizeof(buffer));
 	//ESP_LOGI(TAG, "Buffer = %x", buffer);
 	ESP_LOGI(TAG, "Buffer = %d", *buffer);
     for (int i=0;i<5;i++) {
 		ESP_LOGI(TAG, "adr[%d]=0x%x RX_ADDR_P1 buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
-		// if (adr[i] != buffer[i]) ret = ESP_FAIL;
 	}
 	return ret;
 }
 
-bool data_ready(){
+bool data_ready(NRF24_t * dev){
 	uint8_t fstatus;
-	fstatus = GetFIFOStatus();
+	fstatus = GetFIFOStatus(dev);
 	
 	if((fstatus & 0x01)){
 		ESP_LOGI(TAG, "Waiting for data.");
@@ -306,17 +274,15 @@ bool data_ready(){
 	}
 }
 
-void Get_Data(int * reci_data, uint8_t payload){
-	// int reci_mydata;
+void Get_Data(NRF24_t * dev, uint8_t * reci_data, uint8_t payload){
 	Pin_CSN(0);
-	spi_transfer(R_RX_PAYLOAD); // Send cmd to read rx payload
-	spi_read_byte(&reci_data, &reci_data, payload); // Read payload
+	spi_transfer(dev, R_RX_PAYLOAD); // Send cmd to read rx payload
+	spi_read_byte(dev, reci_data, reci_data, payload); // Read payload
 	Pin_CSN(1); // Pull up chip select
-	configRegister(STATUS, (1 << RX_DR));
-	//printf("Data: %d\n", reci_data);
+	configRegister(dev, STATUS, (1 << RX_DR));
 }
 
-bool spi_recieve_byte(int* Datain, int* Dataout, size_t DataLength )
+bool spi_recieve_byte(NRF24_t * dev, uint8_t* Datain, uint8_t* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -325,7 +291,27 @@ bool spi_recieve_byte(int* Datain, int* Dataout, size_t DataLength )
 		SPITransaction.length = DataLength * 8;
 		SPITransaction.tx_buffer = Dataout;
 		SPITransaction.rx_buffer = Datain;
-		spi_device_transmit( handle, &SPITransaction );
+		spi_device_transmit( dev->_SPIHandle, &SPITransaction );
 	}
 	return true;
 }
+
+void SetSpeedRates(NRF24_t * dev, uint8_t val)
+{
+	if (val > 2) return;
+
+	uint8_t value;
+	ReadRegister(dev, RF_SETUP, &value, 1);
+	if(val == 2)
+	{
+		value = value | 0x20;
+		value = value & 0xF7;
+		configRegister(dev, RF_SETUP, value);
+	}
+	else
+	{
+		value = value & 0xD7;
+		value = value | (val << RF_DR_HIGH);
+		configRegister(dev, RF_SETUP,	value);
+	}
+} 

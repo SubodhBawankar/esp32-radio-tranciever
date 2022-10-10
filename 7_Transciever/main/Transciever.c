@@ -13,15 +13,20 @@
 
 static const char* TAG = "Transciever";
 
+
 void Transmitter(){
-    SPI_Config();
-    int mydata = 128;
-    ESP_LOGI(TAG, "\nMy data is: %d", mydata);
+    NRF24_t device;
+    SPI_Config(&device);
+    uint8_t mydata = 128;
+    uint8_t* ptr_data = &mydata;
+
+    ESP_LOGI(TAG, "\nMy data is: %d", *ptr_data);
     uint8_t payload = sizeof(mydata);
-    uint8_t channel = 50;
-    Register_Config(channel, payload);
-    
-    esp_err_t ret = setTADDR( (uint8_t *)"ARYAN");
+    uint8_t channel = 90;
+    Register_Config(&device, channel, payload);
+    SetSpeedRates(&device, 2); // 250kbps speed rate
+
+    esp_err_t ret = setTADDR(&device, (uint8_t *)"ARYAN");
 	if (ret != ESP_OK) {
 		ESP_LOGE(TAG, "nrf24l01 not installed");
 		while(1) { vTaskDelay(1); }
@@ -33,9 +38,9 @@ void Transmitter(){
             vTaskDelay(1000 / portTICK_PERIOD_MS);
 
             ESP_LOGI(TAG, "Sending Data");
-            Send_data(&mydata, payload);
+            Send_data(&device, ptr_data, payload);
             ESP_LOGI(TAG, "Wait for sending");
-            if (isSend()) {
+            if (isSend(&device)) {
 			    ESP_LOGI(TAG, "Send success");
 		    } 
             else {
@@ -47,27 +52,28 @@ void Transmitter(){
 }
 
 void Reciever(){
-    SPI_Config();
-    int reci_data;
-    // int reci_data[3];
+    NRF24_t device;
+    SPI_Config(&device);
+    uint8_t reci_data = 0;
+    uint8_t *ptr_reci_data = &reci_data;
     
     uint8_t payload = sizeof(reci_data);
-    uint8_t channel = 50;
-    Register_Config(channel, payload);
+    uint8_t channel = 90;
+    Register_Config(&device, channel, payload);
+    SetSpeedRates(&device, 2); // 250kbps speed rate
     
-    esp_err_t ret = setRADDR( (uint8_t *)"ARYAN" );
+    esp_err_t ret = setRADDR(&device,  (uint8_t *)"ARYAN" );
 	if (ret != ESP_OK) {
 		ESP_LOGE(pcTaskGetName(0), "nrf24l01 not installed");
 		while(1) { vTaskDelay(1); }
 	}
     ESP_LOGI(TAG, "Listening ");
     while(1){
-        if(data_ready()){
+        if(data_ready(&device)){
 
             // code to read data
-            Get_Data(&reci_data, payload);
-            ESP_LOGI(TAG, "\nRecieved data is: %d", reci_data);
-            
+            Get_Data(&device, ptr_reci_data, payload);
+            ESP_LOGI(TAG, "\nRecieved data is: %d", *ptr_reci_data);
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
