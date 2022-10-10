@@ -69,15 +69,6 @@ void Register_Config(uint8_t channel, uint8_t payload){
 	configRegister(RX_PW_P1, payload); // Set length of incoming payload
     powerUpRx();
     spi_transfer(FLUSH_RX);
-
-
-	// Set speed rates
-	uint8_t value;
-	ReadRegister(RF_SETUP, &value, 1);
-	value = value & 0xD7;
-	value = value | (0 << RF_DR_HIGH);
-	configRegister(RF_SETUP, value);
-	ESP_LOGW(pcTaskGetName(0), "Set RF Data Ratio to 1MBps");
 }
 
 void configRegister(uint8_t reg, uint8_t value){
@@ -96,21 +87,7 @@ uint8_t spi_transfer(uint8_t address) {
 	return datain[0];
 }
 
-bool spi_read_byte(uint8_t ** Datain, uint8_t ** Dataout, size_t DataLength )
-{
-	spi_transaction_t SPITransaction;
-
-	if ( DataLength > 0 ) {
-		memset( &SPITransaction, 0, sizeof( spi_transaction_t ) );
-		SPITransaction.length = DataLength * 8;
-		SPITransaction.tx_buffer = Dataout;
-		SPITransaction.rx_buffer = Datain;
-		spi_device_transmit( handle, &SPITransaction );
-	}
-	return true;
-}
-
-bool spi_string_read_byte(char** Datain[10], char** Dataout[10], size_t DataLength)
+bool spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -188,7 +165,7 @@ esp_err_t setTADDR(uint8_t * adr)
 }
 
 
-bool spi_send_byte(uint8_t* Dataout, size_t DataLength )
+bool spi_send_byte(int* Dataout, size_t DataLength )
 {
 	spi_transaction_t SPITransaction;
 
@@ -203,22 +180,8 @@ bool spi_send_byte(uint8_t* Dataout, size_t DataLength )
 	return true;
 }
 
-bool spi_send_string_byte(char Dataout[10], size_t DataLength )
-{
-	spi_transaction_t SPITransaction;
 
-	if ( DataLength > 0 ) {
-		memset( &SPITransaction, 0, sizeof( spi_transaction_t ) );
-		SPITransaction.length = DataLength * 8;
-		SPITransaction.tx_buffer = Dataout;
-		SPITransaction.rx_buffer = NULL;
-		spi_device_transmit( handle, &SPITransaction );
-	}
-
-	return true;
-}
-
-void Send_data(uint8_t * value, uint8_t payload){
+void Send_data(int * value, uint8_t payload){
 
 	
 	uint8_t status;
@@ -234,6 +197,27 @@ void Send_data(uint8_t * value, uint8_t payload){
 			break;
 		}
 	}
+	
+
+
+	/*
+	int PTX = 1; 
+	uint8_t status;
+	status = GetStatus();
+	
+	
+	while (PTX == 1) // Wait until last paket is send
+	{
+		vTaskDelay( 1000 / portTICK_PERIOD_MS);
+		status = GetStatus();
+		printf("\nStatus: %d\n", status);
+		
+		if((status & 0x20) == 0x00){
+			PTX = 0;
+			break;
+		}
+	}
+	*/
 
     Pin_CE(0);
     powerUpTx(); // Set to transmitter mode , Power up
@@ -249,47 +233,8 @@ void Send_data(uint8_t * value, uint8_t payload){
 	spi_transfer(W_TX_PAYLOAD); // Write cmd to write payload
 	
     // vTaskDelay(1000 / portTICK_PERIOD_MS);
-	int carry = 128;
-	value = &carry;
+
     spi_send_byte(value, payload); // Write payload
-	Pin_CSN(1); // Pull up chip select
-    Pin_CE(1); // Start transmission
-	
-}
-
-void Send_string_data(char value[10], uint8_t payload){
-
-	
-	uint8_t status;
-	status = GetStatus();
-	while (PTX) // Wait until last paket is send
-	{
-		vTaskDelay(100 / portTICK_PERIOD_MS);
-		status = GetStatus();
-		printf("\nStatus: %d\n", status);
-		if ((status & ((1 << TX_DS))))
-		{
-			PTX = 0;
-			break;
-		}
-	}
-
-    Pin_CE(0);
-    powerUpTx(); // Set to transmitter mode , Power up
-    
-    Pin_CSN(0); // Pull down chip select
-	spi_transfer(FLUSH_TX ); // Write cmd to flush tx fifo
-	Pin_CSN(1); // Pull up chip select
-	
-
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-    Pin_CSN(0); // Pull down chip select
-	spi_transfer(W_TX_PAYLOAD); // Write cmd to write payload
-	
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-    spi_send_string_byte(value, payload); // Write payload
 	Pin_CSN(1); // Pull up chip select
     Pin_CE(1); // Start transmission
 	
@@ -336,7 +281,7 @@ esp_err_t setRADDR(uint8_t * adr){
 
 	// this to verity whether address is properly set or not
 	uint8_t buffer[5];
-	ReadRegister(RX_ADDR_P1, &buffer, sizeof(buffer));
+	ReadRegister(RX_ADDR_P1, buffer, sizeof(buffer));
 	//ESP_LOGI(TAG, "Buffer = %x", buffer);
 	ESP_LOGI(TAG, "Buffer = %d", *buffer);
     for (int i=0;i<5;i++) {
@@ -361,25 +306,15 @@ bool data_ready(){
 	}
 }
 
-void Get_Data(uint8_t* reci_data, uint8_t payload){
+void Get_Data(int * reci_data, uint8_t payload){
 	// int reci_mydata;
 	Pin_CSN(0);
 	spi_transfer(R_RX_PAYLOAD); // Send cmd to read rx payload
 	spi_read_byte(&reci_data, &reci_data, payload); // Read payload
 	Pin_CSN(1); // Pull up chip select
 	configRegister(STATUS, (1 << RX_DR));
-}
-
-void Get_string_Data(char * reci_data[10], uint8_t payload){
-	// int reci_mydata;
-	Pin_CSN(0);
-	spi_transfer(R_RX_PAYLOAD); // Send cmd to read rx payload
-	spi_string_read_byte(&reci_data, &reci_data, payload); // Read payload
-	Pin_CSN(1); // Pull up chip select
-	configRegister(STATUS, (1 << RX_DR));
 	//printf("Data: %d\n", reci_data);
 }
-
 
 bool spi_recieve_byte(int* Datain, int* Dataout, size_t DataLength )
 {
