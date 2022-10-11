@@ -150,7 +150,7 @@ esp_err_t setTADDR(NRF24_t * dev, uint8_t * adr)
 	// this to verity whether address is properly set or not
 	uint8_t buffer[5];
 	ReadRegister(dev, RX_ADDR_P0, buffer, sizeof(buffer));
-	ESP_LOGI(TAG, "Buffer = 0x%x", buffer);
+	ESP_LOGI(TAG, "Buffer = 0x%s", buffer);
     for (int i=0;i<5;i++) {
 		ESP_LOGI(TAG, "adr[%d]=0x%x RX_ADDR_P0 buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
 	}
