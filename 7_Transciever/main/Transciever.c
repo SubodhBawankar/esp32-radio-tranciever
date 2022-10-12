@@ -40,12 +40,7 @@ void Transmitter(){
             ESP_LOGI(TAG, "Sending Data");
             Send_data(&device, ptr_data, payload);
             ESP_LOGI(TAG, "Wait for sending");
-            if (isSend(&device)) {
-			    ESP_LOGI(TAG, "Send success");
-		    } 
-            else {
-			    ESP_LOGW(TAG ,"Send fail:");
-		    }
+            isSend(&device);
             mydata += 1;
         }
     }
