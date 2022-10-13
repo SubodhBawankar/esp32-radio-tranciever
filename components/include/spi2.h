@@ -162,3 +162,7 @@ bool spi_recieve_byte(NRF24_t * dev, uint8_t* Datain, uint8_t* Dataout, size_t D
 bool isSend(NRF24_t * dev);
 
 void SetSpeedRates(NRF24_t * dev, uint8_t val);
+
+void Send_String(NRF24_t * dev, uint8_t * value, uint8_t payload);
+
+void Get_String(NRF24_t * dev, uint8_t * reci_data, uint8_t payload);

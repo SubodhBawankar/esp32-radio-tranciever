@@ -17,11 +17,10 @@ static const char* TAG = "Transciever";
 void Transmitter(){
     NRF24_t device;
     SPI_Config(&device);
-    uint8_t mydata = 65;
-    uint8_t* ptr_data = &mydata;
-
-    ESP_LOGI(TAG, "\nMy data is: %d", *ptr_data);
-    uint8_t payload = sizeof(mydata);
+    uint8_t *mydata = (uint8_t *)"Hello";
+    
+    ESP_LOGI(TAG, "\nMy data is: %d", *mydata);
+    uint8_t payload = (sizeof(mydata) * 2);
     uint8_t channel = 90;
     Register_Config(&device, channel, payload);
     SetSpeedRates(&device, 2); // 250kbps speed rate
@@ -34,11 +33,12 @@ void Transmitter(){
     else{
         ESP_LOGI(TAG, "Done Till now");
         while (1){
-            
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
 
             ESP_LOGI(TAG, "Sending Data");
-            Send_data(&device, ptr_data, payload);
+            // Send_String(&device, (uint8_t *)"ello", payload); // Working
+            Send_String(&device, mydata, payload);
             ESP_LOGI(TAG, "Wait for sending");
             isSend(&device);
         }
@@ -49,10 +49,10 @@ void Transmitter(){
 void Reciever(){
     NRF24_t device;
     SPI_Config(&device);
-    uint8_t reci_data = 0;
+    uint8_t *reci_data = (uint8_t *)"..........";
     uint8_t *ptr_reci_data = &reci_data;
     
-    uint8_t payload = sizeof(reci_data);
+    uint8_t payload = (sizeof(reci_data) * 2);
     uint8_t channel = 90;
     Register_Config(&device, channel, payload);
     SetSpeedRates(&device, 2); // 250kbps speed rate
@@ -68,9 +68,11 @@ void Reciever(){
 
             // code to read data
             Get_Data(&device, ptr_reci_data, payload);
-            ESP_LOGI(TAG, "\nRecieved data is: %c", (char )*ptr_reci_data);
+            //Get_Data(&device, reci_data, payload);
+            ESP_LOGI(TAG, "\nRecieved data is: %s", ptr_reci_data);
+            //ESP_LOGI(TAG, "\n data: %s", (char *)reci_data);
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
     }
 
 }

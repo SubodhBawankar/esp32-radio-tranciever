@@ -209,6 +209,41 @@ void Send_data(NRF24_t * dev, uint8_t * value, uint8_t payload){
 	
 }
 
+void Send_String(NRF24_t * dev, uint8_t * value, uint8_t payload){
+
+	
+	uint8_t status;
+	uint8_t *ptr_val = value;
+	status = GetStatus(dev);
+	while (PTX) // Wait until last paket is send
+	{
+		vTaskDelay(100 / portTICK_PERIOD_MS);
+		status = GetStatus(dev);
+		printf("\nStatus: %d\n", status);
+		if ((status & ((1 << TX_DS))))
+		{
+			PTX = 0;
+			break;
+		}
+	}
+
+    Pin_CE(0);
+    powerUpTx(dev); // Set to transmitter mode , Power up
+    
+    Pin_CSN(0); // Pull down chip select
+	spi_transfer(dev, FLUSH_TX ); // Write cmd to flush tx fifo
+	Pin_CSN(1); // Pull up chip select
+	
+
+    Pin_CSN(0); // Pull down chip select
+	spi_transfer(dev, W_TX_PAYLOAD); // Write cmd to write payload
+	
+
+    spi_send_byte(dev, ptr_val, payload); // Write payload
+	Pin_CSN(1); // Pull up chip select
+    Pin_CE(1); // Start transmission
+	
+}
 
 bool isSend(NRF24_t * dev){
 	uint8_t status;
@@ -252,7 +287,7 @@ esp_err_t setRADDR(NRF24_t * dev, uint8_t * adr){
 	uint8_t buffer[5];
 	ReadRegister(dev, RX_ADDR_P1, buffer, sizeof(buffer));
 	//ESP_LOGI(TAG, "Buffer = %x", buffer);
-	ESP_LOGI(TAG, "Buffer = %d", *buffer);
+	ESP_LOGI(TAG, "Buffer = %s", buffer);
     for (int i=0;i<5;i++) {
 		ESP_LOGI(TAG, "adr[%d]=0x%x RX_ADDR_P1 buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
 	}
@@ -278,6 +313,15 @@ void Get_Data(NRF24_t * dev, uint8_t * reci_data, uint8_t payload){
 	Pin_CSN(0);
 	spi_transfer(dev, R_RX_PAYLOAD); // Send cmd to read rx payload
 	spi_read_byte(dev, reci_data, reci_data, payload); // Read payload
+	Pin_CSN(1); // Pull up chip select
+	configRegister(dev, STATUS, (1 << RX_DR));
+}
+
+void Get_String(NRF24_t * dev, uint8_t * reci_data, uint8_t payload){
+	uint8_t *ptr_val = reci_data;
+	Pin_CSN(0);
+	spi_transfer(dev, R_RX_PAYLOAD); // Send cmd to read rx payload
+	spi_read_byte(dev, ptr_val, ptr_val, payload); // Read payload
 	Pin_CSN(1); // Pull up chip select
 	configRegister(dev, STATUS, (1 << RX_DR));
 }

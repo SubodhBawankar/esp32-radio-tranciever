@@ -32,7 +32,6 @@ void Transmitter(){
     SPI_Config(&device);
     uint8_t mydata = 0;
     uint8_t* ptr_data = &mydata;
-    uint8_t mydata_temp = 111;
     ESP_LOGI(TAG, "\nPWM signal: %d", *ptr_data);
     uint8_t payload = sizeof(mydata);
     uint8_t channel = 90;
@@ -54,13 +53,7 @@ void Transmitter(){
                 ESP_LOGI(TAG, "Sending Data");
                 Send_data(&device, ptr_data, payload);
                 ESP_LOGI(TAG, "Wait for sending");
-                if (isSend(&device)) {
-                    ESP_LOGI(TAG, "Send success");
-                } 
-                else {
-                    ESP_LOGW(TAG ,"Send fail:");
-                }
-                mydata_temp = mydata;
+                isSend(&device);
             }
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             
