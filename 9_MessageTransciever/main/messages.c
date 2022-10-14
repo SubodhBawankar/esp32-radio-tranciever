@@ -17,7 +17,8 @@ static const char* TAG = "Transciever";
 void Transmitter(){
     NRF24_t device;
     SPI_Config(&device);
-    uint8_t *mydata = (uint8_t *)"This message was send using Radio Waves";
+    char *message = "Hello from SRA.";
+    uint8_t *mydata = (uint8_t *)message;
     // ESP_LOGI(TAG, "Size of mydata %d", sizeof(mydata));
     ESP_LOGI(TAG, "mydata is: %d", *mydata);
     uint8_t payload = (sizeof(mydata) * 8);
