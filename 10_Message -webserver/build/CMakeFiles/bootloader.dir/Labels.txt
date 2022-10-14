@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/CMakeFiles/bootloader
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/CMakeFiles/bootloader.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/CMakeFiles/bootloader-complete.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/10_Message -webserver/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
