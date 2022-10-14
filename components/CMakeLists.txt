@@ -5,6 +5,8 @@ list(APPEND include_dirs u8g2/csrc)
 
 list(APPEND srcs "src/u8g2_esp32_hal.c")
 list(APPEND srcs     "src/oled.c" "src/motor.c"
+                     "src/switch.c"
+                     "src/spi2.c"
                      "u8g2/csrc/u8x8_u8toa.c"
                      "u8g2/csrc/u8x8_d_ssd1306_96x16.c"
                      "u8g2/csrc/u8g2_d_memory.c"
