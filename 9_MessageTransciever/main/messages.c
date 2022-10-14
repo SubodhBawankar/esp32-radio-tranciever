@@ -17,10 +17,10 @@ static const char* TAG = "Transciever";
 void Transmitter(){
     NRF24_t device;
     SPI_Config(&device);
-    uint8_t *mydata = (uint8_t *)"Hello World";
+    uint8_t *mydata = (uint8_t *)"This message was send using Radio Waves";
     // ESP_LOGI(TAG, "Size of mydata %d", sizeof(mydata));
     ESP_LOGI(TAG, "mydata is: %d", *mydata);
-    uint8_t payload = (sizeof(mydata) * 3);
+    uint8_t payload = (sizeof(mydata) * 8);
     uint8_t channel = 90;
     Register_Config(&device, channel, payload);
     SetSpeedRates(&device, 2); // 250kbps speed rate
@@ -52,7 +52,7 @@ void Reciever(){
     uint8_t *reci_data = (uint8_t *)"";
     uint8_t *ptr_reci_data = &reci_data;
     
-    uint8_t payload = (sizeof(reci_data) * 3);
+    uint8_t payload = (sizeof(reci_data) * 8);
     uint8_t channel = 90;
     Register_Config(&device, channel, payload);
     SetSpeedRates(&device, 2); // 250kbps speed rate
