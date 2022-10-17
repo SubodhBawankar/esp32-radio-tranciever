@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/home/janhavi/Desktop/EklavyaProject/esp32-radio-tranciever/2_MessageTransciever/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}

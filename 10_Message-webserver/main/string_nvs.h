@@ -32,3 +32,5 @@ typedef struct str_message
 }str_message_t;
 
 void start_tuning_http_server();
+str_message_t read_message();
+
