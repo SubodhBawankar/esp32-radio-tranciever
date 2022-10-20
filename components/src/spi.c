@@ -1,336 +1,240 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "spi.h"
 #include <string.h>
- 
+
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
- 
-#include <driver/spi_master.h>
-#include <driver/gpio.h>
 #include "esp_log.h"
-#include "spi.h"
- 
-#define TAG1 "NRF24L01"
-#define TAG2 "Transmitted"
-#define TAG3 "Received"
-#define TAG4 "Transmittor : "
-#define TAG5 "Receiver : "
-#define HOST SPI2_HOST
- 
-uint8_t channel = 90;
-uint8_t payload ;
-uint8_t PTX = 1;//Default transmittor mode
+#include "driver/spi_common.h"
+#include "driver/spi_master.h"
+#include "esp_check.h"
 
-struct spi_device_t *spi_device_handle;
+#define ADDR_MASK   0x7f
 
-void spi_config()
-{
- esp_err_t ret;
- 
- gpio_reset_pin(CE);
- gpio_set_direction(CE, GPIO_MODE_OUTPUT);
- gpio_set_level(CE, 0);
+static const char* TAG = "SPI.C";
 
- gpio_reset_pin(CSN);
- gpio_set_direction(CSN, GPIO_MODE_OUTPUT);
- gpio_set_level(CSN, 1);
+struct spi_device_t *handle;
 
- spi_bus_config_t bus_config = {
-  .mosi_io_num = MOSI,
-  .miso_io_num = MISO,
-  .sclk_io_num = SCK,
-  //bus_config.max_transfer_sz = 32;
-  .quadwp_io_num = -1,
-  .quadhd_io_num = -1
- };
+esp_err_t spi_config(){
 
-  ret = spi_bus_initialize(HOST, &bus_config, SPI_DMA_CH_AUTO);
-  
-  ESP_LOGI(TAG1, "Initialized SPI Bus %d",ret);
+    esp_err_t ret;
+    gpio_reset_pin(CSN);
+    Pin_CSN(0);
+    Pin_CSN(1);
 
-  spi_device_interface_config_t dev_config;
-   memset( &dev_config, 0, sizeof( spi_device_interface_config_t ) );
-   dev_config.clock_speed_hz = 4000000;
-   //dev_config.command_bits = 8;
-   //dev_config.address_bits = 8;
-   //dev_config.dummy_bits = 1;
-   //dev_config.clock_speed_hz = 2400;
-   dev_config.spics_io_num = -1;
-   dev_config.queue_size = 7;
-   dev_config.mode = 0;
-   dev_config.flags = SPI_DEVICE_NO_DUMMY;
+    //Bus Config    
+    spi_bus_config_t buscfg={
+        .miso_io_num = MISO,
+        .mosi_io_num = MOSI,
+        .sclk_io_num = CLK,
+        .quadwp_io_num = -1,
+        .quadhd_io_num = -1,
+        // .max_transfer_sz = 32,
+    };
 
-   ret=spi_bus_add_device(HOST, &dev_config, &spi_device_handle);
-   ESP_LOGI(TAG1, "Device added %d",ret);
-   ESP_LOGI(TAG1, "SPI Configuration Completed");
-}
-
-void Config_nRF(uint8_t ch, uint8_t pl)//Nrf24_config
-{
- Config_reg(RF_CH , ch);
- Config_reg(RX_PW_P0 , pl);
- Config_reg(RX_PW_P1 , pl);
- PWR_RX();
- transfer_data(FLUSH_RX );
- ESP_LOGI(TAG1,"nRF24L01 Configuration done");
-}
-
-void Config_reg(uint8_t reg, uint8_t value)//Nrf24_configRegister
-{
-  CSN_Low();
-  transfer_data(W_REGISTER | (REGISTER_MASK & reg));
-  transfer_data(value);
-  CSN_High();
-  ESP_LOGI(TAG1,"Config_reg ");
-}
-
-esp_err_t set_R_Add(uint8_t * adrs)//Nrf24_setRADDR
-{
- esp_err_t ret = ESP_OK;
- Write_reg(RX_ADDR_P1,adrs,ADD_LEN);
- uint8_t buffer[5];
- Read_reg(RX_ADDR_P1, buffer, sizeof(buffer));
-    for (int i=0;i<5;i++) 
-    {
-        ESP_LOGI(TAG3, "address[%d]=0x%x buffer[%d]=0x%x", i, adrs[i], i, buffer[i]);
-        if (adrs[i] != buffer[i])
-        {
-         ret = ESP_FAIL;
-        }
-        else
-        {
-         ret = ESP_OK;
-         ESP_LOGI(TAG1,"set_R_Add");
-        }
+    ret =  spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
+    if (ret == ESP_OK){
+        ESP_LOGI(TAG, "Bus Config Done RET: %d", ret);
     }
-    return ret;
-}
- 
-esp_err_t set_T_Add(uint8_t * adrs)//Nrf24_setTADDR
-{
- //esp_err_t ret = ESP_OK;
- esp_err_t ret = ESP_OK;
- Write_reg(RX_ADDR_P0, adrs, ADD_LEN); //RX_ADDR_P0 must be set to the sending addr for auto ack to work.
- Write_reg(TX_ADDR, adrs, ADD_LEN);
- uint8_t buffer[5];
- Read_reg(RX_ADDR_P0, &buffer, sizeof(buffer));
-
- ESP_LOGI(TAG1,"Address: %d",*buffer);
-
- for (int i=0;i<5;i++) 
-  {
-   ESP_LOGI(TAG4, "adrs[%d]=0x%x buffer[%d]=0x%x", i, adrs[i], i, buffer[i]);
-   if (adrs[i] != buffer[i]) 
-   {
-   ret = ESP_FAIL;
-   }
-   else
-   {
-    ret = ESP_OK;
-    ESP_LOGI(TAG1,"set_T_Add");
-   }
-  }
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    
+    // Device Config
+    spi_device_interface_config_t dconfig;
+	memset( &dconfig, 0, sizeof( spi_device_interface_config_t ) );
+	dconfig.clock_speed_hz = 40000000;
+	dconfig.spics_io_num = -1;
+	dconfig.queue_size = 7;
+	dconfig.mode = 0;
+	dconfig.flags = SPI_DEVICE_NO_DUMMY;
+    
+    ret = spi_bus_add_device(SPI2_HOST, &dconfig, &handle);
+    if(ret == ESP_OK){
+        ESP_LOGI(TAG, "Device added to Spi Bus RET: %d", ret);
+    }
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     return ret;
 }
 
-void Read_reg(uint8_t reg, uint8_t* value, uint8_t len)//Nrf24_readRegister
+esp_err_t spi_write_byte(uint8_t* Dataout, size_t DataLength)
 {
-  CSN_Low();
-  transfer_data(R_REGISTER | (REGISTER_MASK &reg));
-  read_data(&reg,&value,len);
-  CSN_High();
-  ESP_LOGI(TAG1,"Read_reg");
-}
- 
-void Write_reg(uint8_t reg, uint8_t * value, uint8_t len)//Nrf24_writeRegister
-{
-  CSN_Low();
-  transfer_data(W_REGISTER | (REGISTER_MASK & reg));
-  write_data(&value,len);
-  CSN_High();
-  ESP_LOGI(TAG1,"write reg");
-}
-
-extern bool Data_Ready()
-{
-    uint8_t status = get_Status();
-    if ( status & (1 << RX_DR) )
+	spi_transaction_t SPITransaction;
+    esp_err_t ret;
+    uint8_t* reg = Dataout;
+    size_t t = DataLength;
+    if (Dataout == RX_ADDR_P0 || Dataout == TX_ADDR)
     {
-      ESP_LOGI(TAG1,"Data_Ready");
-      return 1;
+        Dataout = W_REGISTER | (REGISTER_MASK & reg);
+        DataLength = 5;
     }
-    else
-    {
-    return 0;
+    else{
+        DataLength = t;
     }
-}
- 
-uint8_t get_Status()//Nrf24_getStatus
-{
-  uint8_t rv;
-    Read_reg(STATUS, &rv, 1);
-    ESP_LOGI(TAG1,"get_Status");
-    return rv;
+    
+
+	memset(&SPITransaction, 0, sizeof( spi_transaction_t ));
+	SPITransaction.length = DataLength * 8;
+	SPITransaction.tx_buffer = Dataout;
+	SPITransaction.rx_buffer = NULL;
+	ret = spi_device_transmit(handle, &SPITransaction);
+    if(ret == ESP_OK){
+        printf("\n%s Write Command Executed", Dataout);
+    }
+	return ret;
 }
 
-void get_data(uint8_t * data)//Nrf24_getData
-{
-  CSN_Low();// Pull down chip select
-	transfer_data(R_RX_PAYLOAD); // Send cmd to read rx payload
-	read_data(data, data, payload); // Read payload
-	CSN_High(); 
-	Config_reg(STATUS, (1 << RX_DR)); // Reset status register
-  printf("Data to be sent : %s",data);
-  ESP_LOGI(TAG1,"get_data");
-  vTaskDelay(1000/ portTICK_PERIOD_MS);
+esp_err_t spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength ){
+
+	spi_transaction_t SPITransaction;
+    esp_err_t ret;
+
+	memset( &SPITransaction, 0, sizeof( spi_transaction_t ) );
+	SPITransaction.length = DataLength * 8;
+	SPITransaction.tx_buffer = Dataout;
+	SPITransaction.rx_buffer = Datain;
+	
+    ret = spi_device_transmit( handle, &SPITransaction );
+    // ESP_LOGI(TAG, "RET: %d", ret);
+    printf("\n%d\n", (int)Datain);
+
+    if(ret == ESP_OK){
+        printf("\n%s Read Command Executed\n", Dataout);
+    }
+	return ret;
+}
+esp_err_t assign_register(uint8_t reg, uint8_t value){
+    
+    esp_err_t ret;
+    uint8_t datain[1];
+	uint8_t dataout[1];
+    uint8_t val[1];
+    val[0] = value;
+    dataout[0] = W_REGISTER | (REGISTER_MASK & reg);
+    
+    Pin_CSN(0);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    ret = spi_read_byte(datain, dataout, 1);
+    // spi_write_byte(dataout, 1);
+    Pin_CSN(1);
+
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    Pin_CSN(0);
+    //spi_read_byte(datain, value, 1);
+    ret = spi_write_byte(val, 1);
+
+    Pin_CSN(1);
+   	return ret;
 }
 
-bool write_data(uint8_t* data_s, uint8_t len)
-{
- spi_transaction_t trans;
- if ( len > 0 )
- {
- memset( &data_s, 0, len);
-  //trans.flags = SPI_TRANS_USE_TXDATA;
-  trans.length = len*8;
-  trans.tx_buffer = data_s; 
-  trans.rx_buffer = NULL; 
-  spi_device_transmit( spi_device_handle, &trans);
-  //ESP_LOGI(TAG1, "Sending data \n");
-  //vTaskDelay(1000/ portTICK_PERIOD_MS);
-  //ESP_LOGI(TAG2, "Message:");
-  ESP_LOGI(TAG1,"write_data");
- }
-  return true;
-}
 
-bool read_data(uint8_t* Data_in, uint8_t* Data_out, size_t DLen )
-{
-  //esp_err_t ret;
-  spi_transaction_t trans;
-  if(DLen>0)
-  {
-  memset( &trans, 0, sizeof( spi_transaction_t ) );
-  //trans.flags = SPI_TRANS_USE_RXDATA;
-  trans.length = DLen*8;
-  trans.tx_buffer = Data_out; 
-  trans.rx_buffer = Data_in;
-  spi_device_transmit(spi_device_handle, &trans);
-  //ESP_LOGI(TAG1, "Receiving data \n");
-  vTaskDelay(1000/ portTICK_PERIOD_MS);
-  ESP_LOGI(TAG1,"read_data");
+esp_err_t read_register(uint8_t reg, uint8_t* value){
+    uint8_t datain[1];
+    uint8_t dataout[1];
 
-  }
-  return true;
-}
- 
-uint8_t transfer_data(uint8_t addr)//spi_transfer
-{
- uint8_t datain[1];
- uint8_t dataout[1];
- dataout[0] = addr;
- read_data(datain, dataout, 1);
- ESP_LOGI(TAG1,"transfer_data");
- return datain[0];
-}
- 
-bool Sending()
-{
-  uint8_t status;
-	if (PTX==1) 
-  {
-		while(1) 
-    {
-			status = get_Status();
-			if (status & (1 << TX_DS)) 
-      { // Data Sent TX FIFO interrup
-				PWR_RX();
-				return true;
-			}
+    Pin_CSN(0);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    
+    dataout[0] = R_REGISTER | (REGISTER_MASK & reg);
+    spi_read_byte(datain, dataout, 1);
 
-			if (status & (1 << MAX_RT)) 
-      { // Maximum number of TX retries interrupt
-				PWR_RX();
-				return false;
-			}
-			vTaskDelay(1);
-		}
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Pin_CSN(1);
+
+    // printf("\nint %x\n", (int)datain);
+    // printf("\n 0x: %02x", datain[0]);
+    // printf("Char %x\n", (char)datain);
+    for (int i=0;i<5;i++) {
+		ESP_LOGI(TAG, "\ndatain=0x%x", (char)datain[i]);
 	}
-	return false;
+    // data in has the values
+    // ESP_LOGI(TAG, "Value is %d", (int)datain);
+    return 0;
+
 }
 
-void Send(uint8_t *value)//Nrf24_send
-{
-    uint8_t status;
-    status = get_Status();
-    while (PTX == 1) // Wait until last paket is send
-    {
-        status = get_Status();
-        //printf("Status: %d\n",status);
-        if ((status & ((1 << TX_DS)  | (1 << MAX_RT))))
-        {
-            PTX = 0;//Changing mode to receiver
-            break;
-        }
+void Pin_CSN(int x){
+    // gpio_reset_pin(CSN);
+	gpio_set_direction(CSN, GPIO_MODE_OUTPUT);
+	gpio_set_level(CSN, x);
+}
+
+void config_sender(uint8_t payload_size){
+    uint8_t channel = 0x32; // frequency ch =  50
+    uint8_t size = payload_size;
+    esp_err_t ret;
+    // Transmitter Setting
+    ret = assign_register(CONFIG, 0x7e); // 0x7E --> 126
+    if (ret == ESP_OK)
+    {       
+        printf("\nCONFIG Done");
     }
- CE_Low();
- PWR_TX();
- CSN_Low();
- transfer_data(FLUSH_TX);
- CSN_High();
+    
+    ret = assign_register(RF_CH, channel);
+    if (ret == ESP_OK)
+    {       
+        printf("\nRF_CH Done");
+    }
+    ret = assign_register(EN_RXADDR, 0x02); // data pipe 1 is on
+    if (ret == ESP_OK)
+    {       
+        printf("\nEN_RXADDR Done");
+    }
+    ret = assign_register(SETUP_AW, 0x03); // address bit width = 5
+    if (ret == ESP_OK)
+    {       
+        printf("\nSETUP_AW Done");
+    }
+    ret = assign_register(RF_SETUP, 0x0f); // frequency power and data rate is setup
+    if (ret == ESP_OK)
+    {       
+        printf("\nRF_SETUP Done");
+    }
+    ret = assign_register(SETUP_RETR, 0x03); //max retries = 3
+    if (ret == ESP_OK)
+    {       
+        printf("\nSETUP_RETR Done");
+    }
+    // assign_register(RX_ADDR_P2, 0xc3);
+    
+} 
 
- CSN_Low();
- transfer_data(W_TX_PAYLOAD);
- write_data(value,payload);
- CSN_High();
- CE_High();
- //vTaskDelay(1000/ portTICK_PERIOD_MS);
- ESP_LOGI(TAG1,"Send");
-}
- 
-void PWR_RX()//Nrf24_powerUpRx
-{
-  PTX = 0;
-  CE_Low();
-  Config_reg(CONFIG, NEW_CONFIG | ( (1 << PWR_UP) | (0 << PRIM_RX) ));
-  CE_High();
-	Config_reg(STATUS, (1 << TX_DS) | (1 << MAX_RT)); //Clear seeded interrupt and max tx number interrupt
-  ESP_LOGI(TAG1,"PWR_RX");
+
+void Set_ADDRESS(uint8_t * address){
+    
 }
 
-void PWR_TX()//Nrf24_powerUpTx
-{
-  PTX = 1;
-  Config_reg(CONFIG, NEW_CONFIG | ( (1 << PWR_UP) | (0 << PRIM_RX) ) );
-  ESP_LOGI(TAG1,"PWR_TX");
-  }
 
-void PWR_DWN()//Nrf24_powerDown
-{
-  CE_Low();
-  Config_reg(CONFIG , NEW_CONFIG);
-  ESP_LOGI(TAG1,"PWR_DWN");
-}
-void CSN_Low()//spi_csnLow
-{
- gpio_set_level(CSN, 0);
- ESP_LOGI(TAG1,"CSN_low");
-}
- 
-void CSN_High()//spi_csnHi
-{
- gpio_set_level(CSN, 1);
- ESP_LOGI(TAG1,"CSN_high");
-}
- 
-void CE_Low()
-{
-  gpio_set_level(CE,0);
-  ESP_LOGI(TAG1,"CE_low");
-}
- 
-void CE_High()
-{
-  gpio_set_level(CE,1);
-  ESP_LOGI(TAG1,"CE_high");
+void send(uint8_t senddata, uint8_t payload_size){
+    esp_err_t ret;
+    
+    spi_write_byte((uint8_t *)RX_ADDR_P0, (uint8_t *)"FGHIJ", 5);
+
+    ret = spi_write_byte((uint8_t *)TX_ADDR, (uint8_t *)"FGHIJ", 5);
+    if (ret == ESP_OK)
+    {       
+        printf("\nTX_ADDR Done");
+    }
+    uint8_t buffer[5];
+	read_register(RX_ADDR_P0, buffer, sizeof(buffer));
+	for (int i=0;i<5;i++) {
+		ESP_LOGD(TAG, "RX_ADDR_P0=0x%x buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
+		if (adr[i] != buffer[i]) ret = ESP_FAIL;
+	}
+    
+    
+    
+    
+    
+    
+    ret = assign_register(W_TX_PAYLOAD, senddata);
+    if(ret != ESP_OK){
+        printf("\nError: Data not Transmitted");
+        printf("\nRET: %d", ret);
+    }
+    Pin_CSN(1);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Pin_CSN(0);
+    printf("\nData Send");
 }

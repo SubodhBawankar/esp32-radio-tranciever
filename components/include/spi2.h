@@ -4,9 +4,15 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
-#include "driver/spi_common.h"
-#include "driver/spi_master.h"
+
+#include <driver/spi_master.h>
+#include <driver/gpio.h>
+#include "esp_log.h"
+
+typedef struct
+{
+	spi_device_handle_t _SPIHandle;
+} NRF24_t;
 
 /* Memory Map */
 #define CONFIG      0x00
@@ -88,29 +94,75 @@
 #define REUSE_TX_PL   0xE3
 #define NOP           0xFF
 
+/* Non-P omissions */
+#define LNA_HCURR   0
+
+/* P model memory Map */
+#define RPD                  0x09
+#define W_TX_PAYLOAD_NO_ACK  0xB0
+
+/* P model bit Mnemonics */
+#define RF_DR_LOW   5
+#define RF_DR_HIGH  3
+#define RF_PWR_LOW  1
+#define RF_PWR_HIGH 2
+
+
+#define mirf_ADDR_LEN    5
+#define mirf_CONFIG ((1<<EN_CRC) | (0<<CRCO) )
+
+
 /* Pins Definations */
 #define MOSI    23
 #define MISO    19
-#define CLK     18
+#define SCLK    18
 #define CE      16
 #define CSN     17
 
-
-
-
-
-esp_err_t spi_config();
-
-esp_err_t spi_write_byte(uint8_t* Dataout, size_t DataLength);
-
-esp_err_t spi_read_byte(uint8_t* Datain, uint8_t* Dataout, size_t DataLength);
-
-esp_err_t assign_register(uint8_t reg, uint8_t value);
-
-esp_err_t read_register(uint8_t reg, uint8_t* value);
+void SPI_Config(NRF24_t * dev);
 
 void Pin_CSN(int x);
 
-void config_sender(uint8_t payload_size);
+void Pin_CE(int x);
 
-void send(uint8_t senddata, uint8_t payload_size);
+void Register_Config(NRF24_t * dev, uint8_t channel, uint8_t payload);
+
+void configRegister(NRF24_t * dev, uint8_t reg, uint8_t value);
+
+uint8_t spi_transfer(NRF24_t * dev, uint8_t address);
+
+bool spi_read_byte(NRF24_t * dev, uint8_t* Datain, uint8_t* Dataout, size_t DataLength );
+
+void WriteRegister(NRF24_t * dev, uint8_t reg, uint8_t * value, uint8_t len);
+
+void ReadRegister(NRF24_t * dev, uint8_t reg, uint8_t * value, uint8_t len);
+
+void powerUpRx(NRF24_t * dev);
+
+void powerUpTx(NRF24_t * dev);
+
+esp_err_t setTADDR(NRF24_t * dev, uint8_t * adr);
+
+void Send_data(NRF24_t * dev, uint8_t * value, uint8_t payload);
+
+uint8_t GetStatus(NRF24_t * dev);
+
+esp_err_t setRADDR(NRF24_t * dev, uint8_t * adr);
+
+bool data_ready(NRF24_t * dev);
+
+void Get_Data(NRF24_t * dev, uint8_t * reci_data, uint8_t payload);
+
+uint8_t GetFIFOStatus(NRF24_t * dev);
+
+bool spi_send_byte(NRF24_t * dev, uint8_t* Dataout, size_t DataLength );
+
+bool spi_recieve_byte(NRF24_t * dev, uint8_t* Datain, uint8_t* Dataout, size_t DataLength);
+
+bool isSend(NRF24_t * dev);
+
+void SetSpeedRates(NRF24_t * dev, uint8_t val);
+
+void Send_String(NRF24_t * dev, uint8_t * value, uint8_t payload);
+
+void Get_String(NRF24_t * dev, uint8_t * reci_data, uint8_t payload);
